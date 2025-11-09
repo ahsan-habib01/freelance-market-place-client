@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import { useEffect, useState } from 'react';
+import useAuth from '../Hooks/useAuth';
+import Loading from '../Components/Loading/Loading';
 
 const AllJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const {loading} = useAuth()
 
   useEffect(() => {
     // Replace this with your actual API call later
@@ -15,6 +18,10 @@ const AllJobs = () => {
 
       });
   }, []);
+
+  if (loading) {
+    return <Loading></Loading>
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4 md:px-10">
@@ -58,7 +65,7 @@ const AllJobs = () => {
               </p>
 
               {/* View Details */}
-              <Link to={`/allJobs/${index}`}>
+              <Link to={`/allJobs/${job._id}`}>
                 <button className="mt-3 w-full py-2 bg-green-700 text-white font-medium rounded-xl hover:bg-green-800 transition-all">
                   View Details
                 </button>

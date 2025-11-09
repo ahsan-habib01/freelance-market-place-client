@@ -24,7 +24,7 @@ const Banner = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Link
-              to="/all-jobs"
+              to="/allJobs"
               className="px-8 py-3 bg-[#ffb600] text-green-900 font-semibold rounded-lg hover:bg-amber-500 transition"
             >
               Explore Jobs
