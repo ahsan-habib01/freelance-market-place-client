@@ -7,7 +7,7 @@ const AddJob = () => {
   const { user, loading, setLoading } = useAuth();
   const axiosSecure = useAxiosSecure();
 
-  const handleAddJob = e => {
+  const handleAddJob = async e => {
     e.preventDefault();
     setLoading(true);
 
@@ -35,9 +35,9 @@ const AddJob = () => {
     // });
 
     try {
-      const { data } = axiosSecure.post('/jobs', newJob);
+      const { data } = await axiosSecure.post('/jobs', newJob);
 
-      if (data.insertedId) {
+      if (data?.insertedId) {
         toast.success('✅ Job added successfully!');
         form.reset();
       } else {
@@ -90,7 +90,7 @@ const AddJob = () => {
               required
               className="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value="">Select category</option>
+              <option value="Web Development">Select category</option>
               <option>Web Development</option>
               <option>Graphics Design</option>
               <option>Digital Marketing</option>
@@ -118,7 +118,7 @@ const AddJob = () => {
               type="url"
               name="coverImage"
               required
-              placeholder="Paste image URL (from imgbb)"
+              placeholder="Paste image URL"
               className="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
