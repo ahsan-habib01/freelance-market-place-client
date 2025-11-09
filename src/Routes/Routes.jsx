@@ -7,6 +7,7 @@ import AllJobs from '../Pages/AllJobs';
 import JobDetails from '../Pages/JobDetails';
 import Error from '../Components/Error/Error';
 import Loading from '../Components/Loading/Loading';
+import PrivateRoute from './PrivateRoute';
 
 const router = createBrowserRouter([
   {
@@ -25,7 +26,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'allJobs/:id',
-        Component: JobDetails,
+        element: (
+          <PrivateRoute>
+            <JobDetails></JobDetails>
+          </PrivateRoute>
+        ),
       },
       {
         path: 'auth/login',
