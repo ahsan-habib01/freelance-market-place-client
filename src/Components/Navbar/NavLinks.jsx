@@ -4,7 +4,7 @@ import { NavLink } from 'react-router';
 const NavLinks = () => {
   const links = [
     { name: 'Home', path: '/' },
-    { name: 'All Jobs', path: '/all-jobs' },
+    { name: 'All Jobs', path: '/allJobs' },
     { name: 'Add a Job', path: '/add-job' },
     { name: 'My Accepted Tasks', path: '/my-accepted-tasks' },
   ];

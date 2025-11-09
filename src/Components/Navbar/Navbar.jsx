@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { HashLoader } from 'react-spinners';
 import { Menu, X } from 'lucide-react';
 import { AuthContext } from '../../Contexts/AuthContext';
-import people from '../../assets/people.png'
+import people from '../../assets/people.png';
 
 const Navbar = () => {
   const { user, setUser, signOutUser, loading } = use(AuthContext);
@@ -25,7 +25,9 @@ const Navbar = () => {
   return (
     <nav className="bg-green-100 shadow-md sticky top-0 z-50">
       <div className="w-11/12 mx-auto py-4 flex justify-between items-center">
-        <Logo />
+        <Link to="/">
+          <Logo />
+        </Link>
 
         <div className="hidden md:block">
           <NavLinks />
@@ -98,10 +100,7 @@ const Navbar = () => {
             <div className="space-y-3">
               <div>
                 <img
-                  src={
-                    user?.photoURL ||
-                    people
-                  }
+                  src={user?.photoURL || people}
                   className="h-12 w-12 rounded-full border-2 border-green-400 mx-auto"
                   alt="User"
                 />
