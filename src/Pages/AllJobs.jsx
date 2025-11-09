@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import { useEffect, useState } from 'react';
 import useAuth from '../Hooks/useAuth';
 import Loading from '../Components/Loading/Loading';
+import JobCard from '../Components/JobCard/JobCard';
 
 const AllJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -31,47 +31,8 @@ const AllJobs = () => {
 
       {/* Grid Layout */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {jobs.map((job, index) => (
-          <motion.div
-            key={job._id}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl duration-300"
-          >
-            {/* Cover Image */}
-            <img
-              src={job.coverImage}
-              alt={job.title}
-              className="h-48 w-full object-cover"
-            />
-
-            {/* Card Content */}
-            <div className="p-5 space-y-2">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {job.title}
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                Category:{' '}
-                <span className="text-green-700 dark:text-green-400">
-                  {job.category}
-                </span>
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-300 line-clamp-2">
-                {job.summary}
-              </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">
-                Posted by: {job.postedBy}
-              </p>
-
-              {/* View Details */}
-              <Link to={`/allJobs/${job._id}`}>
-                <button className="mt-3 w-full py-2 bg-green-700 text-white font-medium rounded-xl hover:bg-green-800 transition-all">
-                  View Details
-                </button>
-              </Link>
-            </div>
-          </motion.div>
+        {jobs.map((job) => (
+          <JobCard key={job._id} job={job}></JobCard>
         ))}
       </div>
     </div>

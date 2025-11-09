@@ -5,7 +5,7 @@ const NavLinks = () => {
   const links = [
     { name: 'Home', path: '/' },
     { name: 'All Jobs', path: '/allJobs' },
-    { name: 'Add a Job', path: '/add-job' },
+    { name: 'Add a Job', path: '/addJob' },
     { name: 'My Accepted Tasks', path: '/my-accepted-tasks' },
   ];
 

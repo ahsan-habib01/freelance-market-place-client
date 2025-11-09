@@ -30,7 +30,7 @@ const Banner = () => {
               Explore Jobs
             </Link>
             <Link
-              to="/add-job"
+              to="/addJob"
               className="px-8 py-3 border-2 border-amber-400 font-semibold rounded-lg hover:bg-amber-400 hover:text-green-900 transition"
             >
               Create a Job
