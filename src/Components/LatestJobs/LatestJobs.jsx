@@ -27,9 +27,9 @@ const LatestJobs = () => {
   }
 
   return (
-    <section className="py-12">
+    <section className="bg-green-100 py-12 ">
       <h2 className="text-3xl font-bold text-center mb-6 text-green-700">
-        🚀 Latest Jobs
+        Latest Jobs
       </h2>
       <div className="grid md:grid-cols-3 gap-6 w-11/12 mx-auto">
         {jobs.length > 0 ? (

@@ -71,7 +71,7 @@ const JobDetails = () => {
     }).then(result => {
       if (result.isConfirmed) {
         axios
-          .delete(`/deleteJob/${id}`)
+          .delete(`http://localhost:3000/deleteJob/${id}`)
           .then(() => {
             Swal.fire('Deleted!', 'Job has been deleted.', 'success');
             navigate('/myAddedJobs');

@@ -18,7 +18,7 @@ const MyAddedJobs = () => {
     axiosSecure
       .get(`/myAddedJobs?email=${user.email}`)
       .then(res => {
-        console.log('Fetched my jobs:', res.data);
+        // console.log('Fetched added jobs', res.data);
         setJobs(res.data);
         setIsFetching(false);
       })

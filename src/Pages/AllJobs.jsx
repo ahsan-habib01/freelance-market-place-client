@@ -1,39 +1,54 @@
-import { Link } from 'react-router';
 import { useEffect, useState } from 'react';
 import useAuth from '../Hooks/useAuth';
+import useAxiosSecure from '../Hooks/useAxiosSecure';
 import Loading from '../Components/Loading/Loading';
 import JobCard from '../Components/JobCard/JobCard';
 
 const AllJobs = () => {
   const [jobs, setJobs] = useState([]);
-  const {loading} = useAuth()
+  const [sortOrder, setSortOrder] = useState('desc'); // default: newest first
+  const { loading } = useAuth();
+  const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
-    // Replace this with your actual API call later
-    fetch('http://localhost:3000/jobs')
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        setJobs(data)
+    const fetchJobs = async () => {
+      try {
+        const res = await axiosSecure.get(`/jobs?sort=${sortOrder}`);
+        setJobs(res.data);
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+      }
+    };
+    fetchJobs();
+  }, [sortOrder, axiosSecure]);
 
-      });
-  }, []);
-
-  if (loading) {
-    return <Loading></Loading>
-  }
+  if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4 md:px-10">
-      <h2 className="text-3xl font-bold text-center text-green-700 dark:text-green-400 mb-10">
-        All Freelance Jobs
-      </h2>
+    <div className="min-h-screen bg-green-50 py-10 px-4 md:px-10">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
+        <h2 className="text-3xl font-bold text-green-700 dark:text-green-400">
+          All Freelance Jobs
+        </h2>
+
+        {/* Sort Dropdown */}
+        <select
+          value={sortOrder}
+          onChange={e => setSortOrder(e.target.value)}
+          className="border border-green-400 rounded-lg px-4 py-2 bg-white text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="desc">Newest First</option>
+          <option value="asc">Oldest First</option>
+        </select>
+      </div>
 
       {/* Grid Layout */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {jobs.map((job) => (
-          <JobCard key={job._id} job={job}></JobCard>
-        ))}
+        {jobs.length > 0 ? (
+          jobs.map(job => <JobCard key={job._id} job={job} />)
+        ) : (
+          <p className="text-center text-gray-600">No jobs found.</p>
+        )}
       </div>
     </div>
   );
