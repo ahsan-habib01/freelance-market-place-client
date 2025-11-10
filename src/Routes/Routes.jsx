@@ -11,6 +11,7 @@ import PrivateRoute from './PrivateRoute';
 import AddJob from '../Pages/AddJob';
 import MyAddedJobs from '../Pages/MyAddedJobs';
 import MyAccepted from '../Pages/MyAccepted';
+import UpdateJob from '../Pages/UpdateJob';
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
             <MyAccepted></MyAccepted>
           </PrivateRoute>
         ),
+      },
+      {
+        path: "/update-job/:id",
+        element: <UpdateJob></UpdateJob>
       },
       {
         path: 'auth/login',

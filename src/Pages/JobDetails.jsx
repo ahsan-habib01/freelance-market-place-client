@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'; 
-import { useNavigate, useParams } from 'react-router'; 
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import useAuth from '../Hooks/useAuth';
 import Loading from '../Components/Loading/Loading';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const JobDetails = () => {
       });
   }, [id, setLoading]);
 
+  // ✅ Accept Job
   const handleAcceptJob = () => {
     if (!user) {
       toast.error('Please log in to accept this job');
@@ -36,12 +38,6 @@ const JobDetails = () => {
       toast.error('You cannot accept your own job!');
       return;
     }
-
-    // const alreadyAccepted = acceptedJobs.some(j => j.jobId === job._id);
-    // if (alreadyAccepted) {
-    //   toast.error('You already accepted this job!');
-    //   return;
-    // }
 
     const acceptedJob = {
       title: job.title,
@@ -58,17 +54,36 @@ const JobDetails = () => {
       .then(() => {
         toast.success('Job accepted successfully!');
         navigate('/my-accepted-tasks');
-        console.log('accept job button');
       })
-      .catch(error => {
-        console.error(error);
-        toast.error('Failed to accept job');
-      });
+      .catch(() => toast.error('Failed to accept job'));
   };
 
-  if (loading) {
-    return <Loading></Loading>;
-  }
+  // ✅ Delete Job (Only Owner)
+  const handleDeleteJob = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will permanently delete your job.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e11d48',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(result => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`/deleteJob/${id}`)
+          .then(() => {
+            Swal.fire('Deleted!', 'Job has been deleted.', 'success');
+            navigate('/myAddedJobs');
+          })
+          .catch(() => Swal.fire('Error', 'Failed to delete job', 'error'));
+      }
+    });
+  };
+
+  if (loading) return <Loading />;
+
+  const isOwner = user && user.email === job?.userEmail;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4">
@@ -78,14 +93,12 @@ const JobDetails = () => {
         transition={{ duration: 0.5 }}
         className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden"
       >
-        {/* Image */}
         <img
           src={job?.coverImage}
           alt={job?.title}
           className="w-full h-80 object-cover"
         />
 
-        {/* Job Details */}
         <div className="p-8 space-y-4">
           <h2 className="text-3xl font-bold text-green-700 dark:text-green-400">
             {job?.title}
@@ -103,14 +116,34 @@ const JobDetails = () => {
             {job?.summary}
           </p>
 
-          {/* Accept Job Button */}
-          <div className="pt-6">
-            <button
-              onClick={handleAcceptJob}
-              className="px-6 py-3 bg-green-700 text-white font-semibold rounded-xl hover:bg-green-800 transition-all"
-            >
-              Accept Job
-            </button>
+          <div className="pt-6 flex flex-wrap gap-3">
+            {/* ✅ Accept Button for Others */}
+            {!isOwner && (
+              <button
+                onClick={handleAcceptJob}
+                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all"
+              >
+                Accept Job
+              </button>
+            )}
+
+            {/* ✅ Update & Delete for Owner Only */}
+            {isOwner && (
+              <>
+                <Link to={`/update-job/${id}`}>
+                  <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                    Update Job
+                  </button>
+                </Link>
+
+                <button
+                  onClick={handleDeleteJob}
+                  className="px-6 py-3 bg-rose-600 text-white font-semibold rounded-lg hover:bg-rose-700 transition-all"
+                >
+                  Delete Job
+                </button>
+              </>
+            )}
           </div>
         </div>
       </motion.div>

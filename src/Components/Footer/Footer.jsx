@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { FaFacebook, FaInstagram, FaPinterest } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import Logo from '../Navbar/Logo';
 
 const Footer = () => {
@@ -62,6 +63,14 @@ const Footer = () => {
               className="hover:text-green-600"
             >
               <FaPinterest size={22} />
+            </a>
+            <a
+              href="https://x.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-green-600"
+            >
+              <FaXTwitter size={22}/>
             </a>
           </div>
         </div>
