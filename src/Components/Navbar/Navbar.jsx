@@ -7,6 +7,7 @@ import { HashLoader } from 'react-spinners';
 import { Menu, X } from 'lucide-react';
 import { AuthContext } from '../../Contexts/AuthContext';
 import people from '../../assets/people.png';
+import { IoCreate } from 'react-icons/io5';
 
 const Navbar = () => {
   const { user, setUser, signOutUser, loading } = use(AuthContext);
@@ -47,8 +48,8 @@ const Navbar = () => {
             <button
               popoverTarget="popover-1"
               style={{ anchorName: '--anchor-1' }}
-              className='relative'
-              >
+              className="relative"
+            >
               <img
                 src={
                   user?.photoURL ||
@@ -63,7 +64,7 @@ const Navbar = () => {
               </span>
             </button>
 
-            <div
+            <ul
               className="dropdown dropdown-end menu w-52 rounded-box bg-white shadow-md space-y-2 text-center"
               popover="auto"
               id="popover-1"
@@ -71,13 +72,21 @@ const Navbar = () => {
             >
               <h2 className="text-lg font-semibold">{user?.displayName}</h2>
               <p className="text-sm text-gray-600">{user?.email}</p>
+
+              <li>
+                <Link to={'/myAddedJobs'}>
+                  <IoCreate />
+                  My Added Jobs
+                </Link>
+              </li>
+
               <button
                 onClick={handleSignout}
                 className="px-5 py-2 bg-[#E3B23C] text-white rounded-lg font-semibold hover:bg-[#B97C16] transition cursor-pointer"
               >
                 Sign Out
               </button>
-            </div>
+            </ul>
           </div>
         ) : (
           <div className="hidden md:flex justify-center items-center gap-4">

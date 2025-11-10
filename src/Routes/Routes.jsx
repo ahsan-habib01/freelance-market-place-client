@@ -9,6 +9,7 @@ import Error from '../Components/Error/Error';
 import Loading from '../Components/Loading/Loading';
 import PrivateRoute from './PrivateRoute';
 import AddJob from '../Pages/AddJob';
+import MyAddedJobs from '../Pages/MyAddedJobs';
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <AddJob></AddJob>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'myAddedJobs',
+        element: (
+          <PrivateRoute>
+            <MyAddedJobs></MyAddedJobs>
           </PrivateRoute>
         ),
       },
