@@ -79,7 +79,7 @@ const Login = () => {
           Welcome Back
         </h2>
         <p className="text-center text-sm text-green-700 mb-6">
-          Log in to continue exploring GreenNest
+          Log in to continue exploring Freelify
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">

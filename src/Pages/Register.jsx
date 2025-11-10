@@ -84,7 +84,7 @@ const Register = () => {
           Create Your Account
         </h2>
         <p className="text-center text-sm text-green-700 mb-6">
-          Join GreenNest and bring nature closer to your home.
+          A Global Hub for Freelancers and Dream Projects
         </p>
 
         <form onSubmit={handleRegister} className="space-y-5">

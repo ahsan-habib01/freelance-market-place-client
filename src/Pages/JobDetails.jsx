@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react'; //useContext
-import { useParams } from 'react-router'; //useNavigate
+import { useEffect, useState } from 'react'; 
+import { useNavigate, useParams } from 'react-router'; 
 import { motion } from 'framer-motion';
-// import { AuthContext } from '../Contexts/AuthContext';
-import { toast } from 'react-toastify';
 import axios from 'axios';
 import useAuth from '../Hooks/useAuth';
 import Loading from '../Components/Loading/Loading';
+import toast from 'react-hot-toast';
 
 const JobDetails = () => {
   const { id } = useParams();
-  // const { user } = useContext(AuthContext);
-  // const navigate = useNavigate();
+  const { user, loading, setLoading } = useAuth();
+  const navigate = useNavigate();
   const [job, setJob] = useState(null);
-  const { loading, setLoading } = useAuth();
 
   useEffect(() => {
     axios
@@ -27,40 +25,46 @@ const JobDetails = () => {
       });
   }, [id, setLoading]);
 
-  // const handleAcceptJob = () => {
-  //   if (!user) {
-  //     toast.warn('Please log in to accept this job');
-  //     navigate('/auth/login');
-  //     return;
-  //   }
+  const handleAcceptJob = () => {
+    if (!user) {
+      toast.error('Please log in to accept this job');
+      navigate('/auth/login');
+      return;
+    }
 
-  //   if (user.email === job.userEmail) {
-  //     toast.info('You cannot accept your own job!');
-  //     return;
-  //   }
+    if (user.email === job.userEmail) {
+      toast.error('You cannot accept your own job!');
+      return;
+    }
 
-  //   const acceptedJob = {
-  //     jobId: job._id,
-  //     title: job.title,
-  //     postedBy: job.postedBy,
-  //     category: job.category,
-  //     summary: job.summary,
-  //     coverImage: job.coverImage,
-  //     userEmail: user.email,
-  //     acceptedAt: new Date().toISOString(),
-  //   };
+    // const alreadyAccepted = acceptedJobs.some(j => j.jobId === job._id);
+    // if (alreadyAccepted) {
+    //   toast.error('You already accepted this job!');
+    //   return;
+    // }
 
-  //   axios
-  //     .post('https://your-server-url.vercel.app/accepted-jobs', acceptedJob)
-  //     .then(() => {
-  //       toast.success('Job accepted successfully!');
-  //       navigate('/my-accepted-tasks');
-  //     })
-  //     .catch(error => {
-  //       console.error(error);
-  //       toast.error('Failed to accept job');
-  //     });
-  // };
+    const acceptedJob = {
+      title: job.title,
+      postedBy: job.postedBy,
+      category: job.category,
+      summary: job.summary,
+      coverImage: job.coverImage,
+      userEmail: user.email,
+      acceptedAt: new Date().toISOString(),
+    };
+
+    axios
+      .post('http://localhost:3000/accepted-jobs', acceptedJob)
+      .then(() => {
+        toast.success('Job accepted successfully!');
+        navigate('/my-accepted-tasks');
+        console.log('accept job button');
+      })
+      .catch(error => {
+        console.error(error);
+        toast.error('Failed to accept job');
+      });
+  };
 
   if (loading) {
     return <Loading></Loading>;
@@ -102,7 +106,7 @@ const JobDetails = () => {
           {/* Accept Job Button */}
           <div className="pt-6">
             <button
-              // onClick={handleAcceptJob}
+              onClick={handleAcceptJob}
               className="px-6 py-3 bg-green-700 text-white font-semibold rounded-xl hover:bg-green-800 transition-all"
             >
               Accept Job

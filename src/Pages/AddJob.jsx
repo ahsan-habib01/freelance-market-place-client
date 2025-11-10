@@ -38,14 +38,14 @@ const AddJob = () => {
       const { data } = await axiosSecure.post('/jobs', newJob);
 
       if (data?.insertedId) {
-        toast.success('✅ Job added successfully!');
+        toast.success('Job added successfully!');
         form.reset();
       } else {
         toast.error('Failed to add job.');
       }
     } catch (err) {
       console.error(err);
-      toast.error('❌ Something went wrong!');
+      toast.error('Something went wrong!');
     } finally {
       setLoading(false);
     }
