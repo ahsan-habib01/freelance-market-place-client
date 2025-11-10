@@ -3,6 +3,7 @@ import { Outlet } from 'react-router';
 import Navbar from '../Components/Navbar/Navbar';
 import Footer from '../Components/Footer/Footer';
 import { Toaster } from 'react-hot-toast';
+import ScrollToTop from '../Static/ScrollToTop';
 
 const RootLayout = () => {
   return (
@@ -17,6 +18,7 @@ const RootLayout = () => {
         <Footer></Footer>
       </footer>
       <div>
+        <ScrollToTop></ScrollToTop>
         <Toaster position="top-center" reverseOrder={false} />
       </div>
     </div>

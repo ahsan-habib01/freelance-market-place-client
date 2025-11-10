@@ -43,11 +43,12 @@ const Navbar = () => {
         {loading ? (
           <HashLoader color="green" size={40} />
         ) : user ? (
-          <div className="hidden md:flex flex-col items-center space-y-2 relative">
+          <div className="hidden md:flex flex-col items-center space-y-2 relative group">
             <button
               popoverTarget="popover-1"
               style={{ anchorName: '--anchor-1' }}
-            >
+              className='relative'
+              >
               <img
                 src={
                   user?.photoURL ||
@@ -56,6 +57,10 @@ const Navbar = () => {
                 className="h-11 w-11 border-2 border-green-400 rounded-full object-cover cursor-pointer"
                 alt="User"
               />
+
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-sm font-medium py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-md">
+                {user?.displayName}
+              </span>
             </button>
 
             <div
