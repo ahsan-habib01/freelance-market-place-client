@@ -58,14 +58,14 @@ const JobDetails = () => {
       .catch(() => toast.error('Failed to accept job'));
   };
 
-  // ✅ Delete Job (Only Owner)
+  // ✅ Delete Job
   const handleDeleteJob = () => {
     Swal.fire({
       title: 'Are you sure?',
       text: 'This will permanently delete your job.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#e11d48',
+      confirmButtonColor: '#ff6900',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, delete it!',
     }).then(result => {
@@ -86,25 +86,34 @@ const JobDetails = () => {
   const isOwner = user && user.email === job?.userEmail;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4">
+    <section className="min-h-screen bg-gradient-to-br from-[#fff3ea] via-[#fff7f0] to-[#fffaf7] dark:from-[#1a1a1a] dark:via-[#111] dark:to-[#000] py-12 px-4">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden"
+        className="max-w-4xl mx-auto bg-white/90 dark:bg-[#121212] shadow-2xl rounded-3xl overflow-hidden backdrop-blur-sm border border-[#ff9346]/30"
       >
-        <img
+        {/* Cover Image */}
+        <motion.img
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
           src={job?.coverImage}
           alt={job?.title}
           className="w-full h-80 object-cover"
         />
 
-        <div className="p-8 space-y-4">
-          <h2 className="text-3xl font-bold text-green-700 dark:text-green-400">
+        {/* Job Info */}
+        <div className="p-8 space-y-5">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#ff6900] dark:text-[#ff9346]">
             {job?.title}
           </h2>
+
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            <strong>Category:</strong> {job?.category}
+            <strong>Category:</strong>{' '}
+            <span className="text-[#ff6900] dark:text-[#ff9346] font-medium">
+              {job?.category}
+            </span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             <strong>Posted By:</strong> {job?.postedBy}
@@ -112,33 +121,33 @@ const JobDetails = () => {
           <p className="text-sm text-gray-600 dark:text-gray-300">
             <strong>Posted Email:</strong> {job?.userEmail}
           </p>
-          <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed">
+
+          <p className="text-base text-gray-700 dark:text-gray-200 leading-relaxed border-t border-[#ff9346]/20 pt-4">
             {job?.summary}
           </p>
 
-          <div className="pt-6 flex flex-wrap gap-3">
-            {/* ✅ Accept Button for Others */}
+          {/* Buttons */}
+          <div className="pt-6 flex flex-wrap gap-4">
             {!isOwner && (
               <button
                 onClick={handleAcceptJob}
-                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all"
+                className="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
               >
                 Accept Job
               </button>
             )}
 
-            {/* ✅ Update & Delete for Owner Only */}
             {isOwner && (
               <>
                 <Link to={`/update-job/${id}`}>
-                  <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                  <button className="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#38bdf8] to-[#0ea5e9] hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
                     Update Job
                   </button>
                 </Link>
 
                 <button
                   onClick={handleDeleteJob}
-                  className="px-6 py-3 bg-rose-600 text-white font-semibold rounded-lg hover:bg-rose-700 transition-all"
+                  className="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
                 >
                   Delete Job
                 </button>
@@ -147,7 +156,7 @@ const JobDetails = () => {
           </div>
         </div>
       </motion.div>
-    </div>
+    </section>
   );
 };
 

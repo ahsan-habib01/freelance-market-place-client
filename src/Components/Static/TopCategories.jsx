@@ -37,7 +37,7 @@ const categories = [
 
 const TopCategories = () => {
   return (
-    <section className="relative py-20 px-6 md:px-10 bg-gradient-to-br from-[#fff3e5] via-[#ffe8d2] to-[#ffd9b8] dark:from-[#111418] dark:via-[#181d23] dark:to-[#20262e] overflow-hidden">
+    <section className="relative py-20 px-6 md:px-10 bg-gradient-to-br from-[#fff3e5] via-[#ffe8d2] to-[#ffd9b8] dark:from-gray-800 dark:via-[#181d23] dark:to-[#20262e] overflow-hidden">
       {/* Background Glow */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-32 left-20 w-72 h-72 bg-[#ff9346]/20 blur-3xl rounded-full animate-pulse"></div>

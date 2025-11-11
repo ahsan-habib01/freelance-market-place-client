@@ -4,6 +4,7 @@ import useAxiosSecure from '../Hooks/useAxiosSecure';
 import Swal from 'sweetalert2';
 import Loading from '../Components/Loading/Loading';
 import useAuth from '../Hooks/useAuth';
+import { motion } from 'framer-motion';
 
 const UpdateJob = () => {
   const { id } = useParams();
@@ -20,8 +21,7 @@ const UpdateJob = () => {
         setJob(res.data);
         setLoading(false);
       })
-      .catch(err => {
-        console.error(err);
+      .catch(() => {
         Swal.fire('Error!', 'Failed to load job details.', 'error');
       });
   }, [id, axiosSecure, setLoading]);
@@ -45,15 +45,14 @@ const UpdateJob = () => {
             title: 'Updated!',
             text: 'Job updated successfully!',
             icon: 'success',
-            confirmButtonColor: '#22c55e',
+            confirmButtonColor: '#ff6900',
           });
           navigate('/myAddedJobs');
         } else {
           Swal.fire('No Change', 'No fields were updated.', 'info');
         }
       })
-      .catch(err => {
-        console.error(err);
+      .catch(() => {
         Swal.fire('Error!', 'Failed to update job.', 'error');
       });
   };
@@ -61,13 +60,21 @@ const UpdateJob = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 dark:from-gray-900 dark:to-gray-800 py-10 px-4">
-      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-        <h2 className="text-4xl font-bold text-center text-green-700 dark:text-green-400 mb-10">
+    <section className="min-h-screen py-16 px-4 bg-gradient-to-br from-[#fff4ec] via-[#fff7f3] to-[#fffaf8] dark:from-[#0f0f0f] dark:via-[#161616] dark:to-[#1c1c1c]">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-3xl mx-auto bg-white/90 dark:bg-[#121212] shadow-2xl rounded-3xl p-10 border border-[#ff9346]/20 backdrop-blur-sm"
+      >
+        {/* Title */}
+        <h2 className="text-4xl font-extrabold text-center mb-10 bg-gradient-to-r from-[#ff9346] to-[#ff6900] bg-clip-text text-transparent">
           Update Job
         </h2>
 
+        {/* Form */}
         <form onSubmit={handleUpdateJob} className="space-y-6">
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Job Title
@@ -76,11 +83,12 @@ const UpdateJob = () => {
               type="text"
               name="title"
               defaultValue={job?.title}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
               required
             />
           </div>
 
+          {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Category
@@ -88,7 +96,7 @@ const UpdateJob = () => {
             <select
               name="category"
               defaultValue={job?.category}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
               required
             >
               <option>Web Development</option>
@@ -100,6 +108,7 @@ const UpdateJob = () => {
             </select>
           </div>
 
+          {/* Summary */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Summary
@@ -108,10 +117,11 @@ const UpdateJob = () => {
               name="summary"
               defaultValue={job?.summary}
               rows="4"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
             ></textarea>
           </div>
 
+          {/* Cover Image */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Cover Image URL
@@ -120,20 +130,23 @@ const UpdateJob = () => {
               type="text"
               name="coverImage"
               defaultValue={job?.coverImage}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
               required
             />
           </div>
 
-          <button
+          {/* Button */}
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             type="submit"
-            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all"
+            className="w-full py-3 font-semibold text-white rounded-xl bg-gradient-to-r from-[#ff9346] to-[#ff6900] shadow-md hover:shadow-lg hover:brightness-110 transition-all duration-300"
           >
             Save Changes
-          </button>
+          </motion.button>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </section>
   );
 };
 

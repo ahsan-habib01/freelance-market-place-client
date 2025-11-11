@@ -33,9 +33,12 @@ const MyAddedJobs = () => {
   }
 
   return (
-    <div className="mx-2 my-10">
-      <div className="text-2xl text-center font-bold mt-5">
-        My Added Jobs ({jobs.length})
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5ec] via-[#fff0e5] to-[#ffebe0] dark:from-[#0f1116] dark:via-[#14181f] dark:to-[#1a1f27] py-12 px-4">
+      <div className="text-4xl font-bold text-center mb-10 text-[#ff6900] dark:text-[#ff9346]">
+        My Added Jobs{' '}
+        <span className="text-gray-600 dark:text-gray-400 text-lg font-normal ml-2">
+          ({jobs.length})
+        </span>
       </div>
 
       {jobs.length === 0 ? (

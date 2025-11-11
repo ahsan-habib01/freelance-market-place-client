@@ -19,10 +19,10 @@ const Banner = () => {
           transition={{ duration: 1 }}
           className="flex-1 text-center md:text-left"
         >
-          <span className="bg-white dark:bg-black p-3 rounded-sm relative">
+          <span className="bg-white dark:bg-black p-3 pl-6 rounded-sm relative">
             <GoDotFill
               color="#ff6900"
-              className="absolute -left-1.5 -top-1 animate-ping"
+              className="absolute left-1 top-3 animate-ping"
             />
             Freelance Marketplace
           </span>
@@ -38,7 +38,7 @@ const Banner = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Link
               to="/allJobs"
-              className="px-8 py-3 bg-[#ff6900]  font-semibold rounded-lg hover:bg-[#ff5506] transition"
+              className="px-8 py-3 bg-gradient-to-r from-[#ff9346] to-[#ff6900] font-semibold rounded-lg hover:bg-[#ff5506] transition"
             >
               Explore Jobs
             </Link>

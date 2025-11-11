@@ -6,79 +6,83 @@ import Logo from '../Navbar/Logo';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-green-200 via-green-100 to-green-100 text-green-900">
-      <div className="w-11/12 mx-auto  py-8 grid md:grid-cols-3 gap-6 text-center md:text-left">
+    <footer className="bg-gradient-to-br from-[#ffd9b8] via-[#ffe8d2] to-[#ffd9b8] dark:from-[#1a1a1a] dark:via-[#111] dark:to-[#000]  transition-all duration-500">
+      {/* Main Footer */}
+      <div className="w-11/12 mx-auto py-12 grid md:grid-cols-3 gap-10 text-center md:text-left">
         <div>
-          <Logo></Logo>
-          <p className="text-sm text-green-800 mt-2 mr-5">
-            Freelify connects skilled freelancers with clients worldwide. A
-            trusted marketplace where projects turn into possibilities.
+          <Logo />
+          <p className="text-sm text-black/90 dark:text-white/90 mt-3 max-w-sm mx-auto md:mx-0 leading-relaxed">
+            Freelify bridges the gap between talented freelancers and clients
+            across the globe — turning ideas into impactful projects.
           </p>
         </div>
 
+        {/* Quick Links */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
-          <ul className="space-y-1">
+          <h3 className="text-lg font-semibold mb-3 text-black/90 dark:text-white/90 tracking-wide">
+            Quick Links
+          </h3>
+          <ul className="space-y-2">
             <li>
-              <Link to="/about" className="hover:text-green-600">
+              <Link
+                to="/about"
+                className="text-black/90 dark:text-white/90 hover:text-[#ff9346] hover:translate-x-1 inline-block transition-all duration-300"
+              >
                 About
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="hover:text-green-600">
+              <Link
+                to="/contact"
+                className="text-black/90 dark:text-white/90 hover:text-[#ff9346] hover:translate-x-1 inline-block transition-all duration-300"
+              >
                 Contact
               </Link>
             </li>
             <li>
-              <Link to="/privacy-policy" className="hover:text-green-600">
+              <Link
+                to="/privacy-policy"
+                className="text-black/90 dark:text-white/90 hover:text-[#ff9346] hover:translate-x-1 inline-block transition-all duration-300"
+              >
                 Privacy Policy
               </Link>
             </li>
           </ul>
         </div>
 
+        {/* Social Links */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Follow Us</h3>
-          <div className="flex justify-center md:justify-start gap-4">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-600"
-            >
-              <FaInstagram size={22} />
-            </a>
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-600"
-            >
-              <FaFacebook size={22} />
-            </a>
-            <a
-              href="https://pinterest.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-600"
-            >
-              <FaPinterest size={22} />
-            </a>
-            <a
-              href="https://x.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-600"
-            >
-              <FaXTwitter size={22}/>
-            </a>
+          <h3 className="text-lg font-semibold mb-3  tracking-wide">
+            Follow Us
+          </h3>
+          <div className="flex justify-center md:justify-start gap-5">
+            {[
+              { icon: <FaInstagram />, link: 'https://instagram.com' },
+              { icon: <FaFacebook />, link: 'https://facebook.com' },
+              { icon: <FaPinterest />, link: 'https://pinterest.com' },
+              { icon: <FaXTwitter />, link: 'https://x.com' },
+            ].map((social, i) => (
+              <a
+                key={i}
+                href={social.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-white/10 hover:bg-[#ff9346]/20 hover:text-[#ff9346] text-black/90 dark:text-white/90 hover:scale-110 transform transition-all duration-300"
+              >
+                {social.icon}
+              </a>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="w-11/12 mx-auto border-t border-green-300 text-center py-3 text-sm text-green-800">
-        © 2025 <span className="font-semibold">Freelify</span>. All rights
-        reserved.
+      {/* Divider */}
+      <div className="w-11/12 mx-auto border-t border-black/20 text-center py-4 text-sm text-black/90 dark:text-white/90">
+        © 2025{' '}
+        <span className="font-semibold text-black/90 dark:text-white/90 hover:text-[#ff9346] transition-colors duration-300">
+          Freelify
+        </span>
+        . All rights reserved.
       </div>
     </footer>
   );

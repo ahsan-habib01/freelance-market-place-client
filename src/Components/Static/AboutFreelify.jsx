@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, ShieldCheck, Zap } from 'lucide-react';
+import { Link } from 'react-router';
 
 const AboutFreelify = () => {
   const features = [
@@ -88,14 +89,14 @@ const AboutFreelify = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
           viewport={{ once: true }}
-          className="mt-16"
+          className=""
         >
-          <a
-            href="/allJobs"
-            className="inline-block bg-[#ff9346] dark:bg-[#ff7a2a] hover:bg-[#ff6900] dark:hover:bg-[#ff5500] text-white font-semibold py-3 px-8 rounded-full shadow-md transition-all duration-300 hover:shadow-lg"
+          {/* <Link
+            to="/allJobs"
+            className="px-8 py-3 bg-[#ff6900]  font-semibold rounded-lg hover:bg-[#ff5506] transition"
           >
             Explore Jobs
-          </a>
+          </Link> */}
         </motion.div>
       </div>
     </section>

@@ -25,9 +25,9 @@ const AllJobs = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-green-50 py-10 px-4 md:px-10">
+    <div className="min-h-screen bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] dark:from-[#0f172a] dark:to-[#020617] py-10 px-4 md:px-10">
       <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
-        <h2 className="text-3xl font-bold text-green-700 dark:text-green-400">
+        <h2 className="text-3xl font-bold text-[#ff6900] dark:text-[#ff9346]">
           All Freelance Jobs
         </h2>
 
@@ -35,7 +35,7 @@ const AllJobs = () => {
         <select
           value={sortOrder}
           onChange={e => setSortOrder(e.target.value)}
-          className="border border-green-400 rounded-lg px-4 py-2 bg-white text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="border border-[#ff9346] rounded-lg px-4 py-2 bg-white text-[#ff6900] focus:outline-none focus:ring-2 focus:ring-[#ff9346]"
         >
           <option value="desc">Newest First</option>
           <option value="asc">Oldest First</option>

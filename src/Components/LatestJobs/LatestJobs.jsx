@@ -30,9 +30,9 @@ const LatestJobs = () => {
   return (
     <section
       className="
-        py-20 px-6 md:px-10 
-        bg-gradient-to-br from-[#fff5ec] via-[#fff0e5] to-[#ffebe0]
-        dark:from-[#0f1116] dark:via-[#14181f] dark:to-[#1a1f27]
+        py-20 
+        bg-gradient-to-br from-[#ffebe0] via-[#fff0e5] to-[#fff5ec]
+        dark:from-gray-800 dark:via-[#14181f] dark:to-[#1a1f27]
       "
     >
       <div className="text-center mb-12">

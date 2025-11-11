@@ -100,14 +100,14 @@ const Navbar = () => {
             <ThemeToggle></ThemeToggle>
             <Link
               to="/auth/login"
-              className="px-5 py-2 border-2 border-green-600 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 hover:border-green-700 transition"
+              className="px-5 py-2 border-2 border-[#ff6900] bg-gradient-to-r from-[#ff9346] to-[#ff6900] text-white rounded-lg font-semibold hover:bg-green-700 hover:border-[#ff9346] transition"
             >
               Login
             </Link>
 
             <Link
               to="/auth/register"
-              className="px-5 py-2 border-2 border-green-600 text-green-700 rounded-lg font-semibold hover:bg-green-600 hover:text-white transition"
+              className="px-5 py-2 border-2 border-[#ff6900] text-[#ff6900] rounded-lg font-semibold hover:bg-[#ff5506] hover:text-white transition"
             >
               Register
             </Link>
