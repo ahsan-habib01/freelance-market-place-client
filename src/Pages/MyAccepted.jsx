@@ -38,8 +38,8 @@ const MyAccepted = () => {
       if (res.data.deletedCount > 0) {
         toast.success(
           type === 'done'
-            ? 'Task marked as completed 🎉'
-            : 'Task cancelled successfully ❌'
+            ? 'Task marked as completed'
+            : 'Task cancelled successfully'
         );
       } else {
         toast.error('Failed to update task.');

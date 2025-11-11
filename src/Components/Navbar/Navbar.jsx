@@ -43,7 +43,7 @@ const Navbar = () => {
         </button>
 
         {loading ? (
-          <HashLoader color="green" size={40} />
+          <HashLoader color="orange" size={40} />
         ) : user ? (
           <div className="hidden md:flex flex-col items-center space-y-2 ">
             <div className="flex justify-center items-center gap-4">
@@ -78,13 +78,13 @@ const Navbar = () => {
               <p className="text-sm ">{user?.email}</p>
 
               <li>
-                <Link
+                {/* <Link
                   to={'/myAddedJobs'}
                   className="hover:bg-amber-50 hover:text-black"
                 >
                   <IoCreate color="#ff9346" />
                   My Added Jobs
-                </Link>
+                </Link> */}
               </li>
 
               <button
@@ -100,14 +100,14 @@ const Navbar = () => {
             <ThemeToggle></ThemeToggle>
             <Link
               to="/auth/login"
-              className="px-5 py-2 border-2 border-[#ff6900] bg-gradient-to-r from-[#ff9346] to-[#ff6900] text-white rounded-lg font-semibold hover:bg-green-700 hover:border-[#ff9346] transition"
+              className="px-5 py-2 border-2 border-[#ff6900] bg-gradient-to-r from-[#ff9346] to-[#ff6900] text-white rounded-lg font-semibold hover:bg-green-700 hover:border-[#ff9346] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Login
             </Link>
 
             <Link
               to="/auth/register"
-              className="px-5 py-2 border-2 border-[#ff6900] text-[#ff6900] rounded-lg font-semibold hover:bg-[#ff5506] hover:text-white transition"
+              className="px-5 py-2 border-2 border-[#ff6900] text-[#ff6900] rounded-lg font-semibold hover:bg-[#ff5506] hover:text-white hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Register
             </Link>

@@ -38,13 +38,13 @@ const Banner = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Link
               to="/allJobs"
-              className="px-8 py-3 bg-gradient-to-r from-[#ff9346] to-[#ff6900] font-semibold rounded-lg hover:bg-[#ff5506] transition"
+              className="inline-block px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Explore Jobs
             </Link>
             <Link
               to="/addJob"
-              className="px-8 py-3 border-2 border-[#ff6900] font-semibold rounded-lg hover:bg-[#ff5506] transition"
+              className="px-8 py-3 border-2 border-[#ff6900] font-semibold rounded-lg hover:bg-[#ff5506] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Create a Job
             </Link>

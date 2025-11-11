@@ -2,7 +2,7 @@ import React, { useState, use } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../Contexts/AuthContext';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);

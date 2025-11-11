@@ -12,6 +12,7 @@ import AddJob from '../Pages/AddJob';
 import MyAddedJobs from '../Pages/MyAddedJobs';
 import MyAccepted from '../Pages/MyAccepted';
 import UpdateJob from '../Pages/UpdateJob';
+import DeleteJob from '../Pages/DeleteJob';
 
 const router = createBrowserRouter([
   {
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/my-accepted-tasks',
+        path: 'my-accepted-tasks',
         element: (
           <PrivateRoute>
             <MyAccepted></MyAccepted>
@@ -61,8 +62,20 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/update-job/:id",
-        element: <UpdateJob></UpdateJob>
+        path: 'update-job/:id',
+        element: (
+          <PrivateRoute>
+            <UpdateJob></UpdateJob>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'deleteJob/:id',
+        element: (
+          <PrivateRoute>
+            <DeleteJob></DeleteJob>
+          </PrivateRoute>
+        ),
       },
       {
         path: 'auth/login',

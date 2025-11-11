@@ -60,25 +60,7 @@ const JobDetails = () => {
 
   // ✅ Delete Job
   const handleDeleteJob = () => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'This will permanently delete your job.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ff6900',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, delete it!',
-    }).then(result => {
-      if (result.isConfirmed) {
-        axios
-          .delete(`http://localhost:3000/deleteJob/${id}`)
-          .then(() => {
-            Swal.fire('Deleted!', 'Job has been deleted.', 'success');
-            navigate('/myAddedJobs');
-          })
-          .catch(() => Swal.fire('Error', 'Failed to delete job', 'error'));
-      }
-    });
+    navigate(`/deleteJob/${id}`);
   };
 
   if (loading) return <Loading />;
