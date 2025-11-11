@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Logo from './Logo';
 import NavLinks from './NavLinks';
 import { Link, useNavigate } from 'react-router';
@@ -13,6 +13,17 @@ const Navbar = () => {
   const { user, setUser, signOutUser, loading } = use(AuthContext);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    const html = document.querySelector('html');
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const handleTheme = checked => {
+    setTheme(checked ? 'dark' : 'light');
+  };
 
   const handleSignout = () => {
     signOutUser()
@@ -90,6 +101,12 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="hidden md:flex justify-center items-center gap-4">
+            <input
+              onChange={e => handleTheme(e.target.checked)}
+              type="checkbox"
+              defaultChecked={localStorage.getItem('theme') === 'dark'}
+              className="toggle"
+            />
             <Link
               to="/auth/login"
               className="px-5 py-2 border-2 border-green-600 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 hover:border-green-700 transition"

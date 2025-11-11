@@ -1,15 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
-  name: "light";
+  name: 'light';
   default: true;
-  --color-primary: '#064E3B';
-  --color-secondary: #D97706;
+  --color-primary: '#ff6900';
+  --color-secondary: #d97706;
 }
 
-* {
-  font-family: 'Lora', serif;
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
 }
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+* {
+  font-family: 'Rubik', sans-serif;
+}
+
+
