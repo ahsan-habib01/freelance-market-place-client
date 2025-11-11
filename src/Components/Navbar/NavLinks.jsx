@@ -19,11 +19,11 @@ const NavLinks = () => {
               `relative font-medium transition-all duration-300 
                ${
                  isActive
-                   ? 'text-green-700 after:w-full after:scale-x-100 after:opacity-100'
-                   : 'text-green-900 hover:text-green-700'
+                   ? 'text-[#ff6300] dark:text-[#ff6900] after:w-full after:scale-x-100 after:opacity-100'
+                   : ' dark:text-white hover:text-[#ff6900]'
                } 
                after:content-[""] after:absolute after:left-0 after:-bottom-1 
-               after:h-[2px] after:bg-gradient-to-r after:from-green-400 after:via-green-600 after:to-green-700 
+               after:h-[2px] after:bg-gradient-to-r  after:from-orange-400 after:via-orange-500 after:to-orange-600 
                after:scale-x-0 after:origin-left after:transition-transform after:duration-300
                hover:after:scale-x-100 hover:after:opacity-100
                hover:scale-105`

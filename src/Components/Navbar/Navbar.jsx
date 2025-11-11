@@ -8,22 +8,12 @@ import { Menu, X } from 'lucide-react';
 import { AuthContext } from '../../Contexts/AuthContext';
 import people from '../../assets/people.png';
 import { IoCreate } from 'react-icons/io5';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const { user, setUser, signOutUser, loading } = use(AuthContext);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-
-  useEffect(() => {
-    const html = document.querySelector('html');
-    html.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const handleTheme = checked => {
-    setTheme(checked ? 'dark' : 'light');
-  };
 
   const handleSignout = () => {
     signOutUser()
@@ -35,7 +25,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-green-100 shadow-md sticky top-0 z-50">
+    <nav className=" dark:bg-gray-800 shadow-md sticky top-0 z-50">
       <div className="w-11/12 mx-auto py-4 flex justify-between items-center">
         <Link to="/">
           <Logo />
@@ -56,44 +46,47 @@ const Navbar = () => {
           <HashLoader color="green" size={40} />
         ) : user ? (
           <div className="hidden md:flex flex-col items-center space-y-2 relative group">
-            <button
-              popoverTarget="popover-1"
-              style={{ anchorName: '--anchor-1' }}
-              className="relative"
-            >
-              <img
-                src={
-                  user?.photoURL ||
-                  'https://img.icons8.com/?size=160&id=114015&format=png'
-                }
-                className="h-11 w-11 border-2 border-green-400 rounded-full object-cover cursor-pointer"
-                alt="User"
-              />
+            <div className='flex justify-center items-center gap-4'>
+              <ThemeToggle></ThemeToggle>
+              <button
+                popoverTarget="popover-1"
+                style={{ anchorName: '--anchor-1' }}
+                className="relative"
+              >
+                <img
+                  src={
+                    user?.photoURL ||
+                    'https://img.icons8.com/?size=160&id=114015&format=png'
+                  }
+                  className="h-11 w-11 border-2 border-amber-400 rounded-full object-cover cursor-pointer"
+                  alt="User"
+                />
 
-              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-sm font-medium py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-md">
-                {user?.displayName}
-              </span>
-            </button>
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-[#ff9346] text-white text-sm font-medium py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-md">
+                  {user?.displayName}
+                </span>
+              </button>
+            </div>
 
             <ul
-              className="dropdown dropdown-end menu w-52 rounded-box bg-white shadow-md space-y-2 text-center"
+              className="dropdown dropdown-end menu w-52 rounded-box bg-white dark:bg-gray-700 shadow-md space-y-2 text-center"
               popover="auto"
               id="popover-1"
               style={{ positionAnchor: '--anchor-1' }}
             >
               <h2 className="text-lg font-semibold">{user?.displayName}</h2>
-              <p className="text-sm text-gray-600">{user?.email}</p>
+              <p className="text-sm ">{user?.email}</p>
 
               <li>
-                <Link to={'/myAddedJobs'}>
-                  <IoCreate />
+                <Link to={'/myAddedJobs'} className='hover:bg-amber-50 hover:text-black'>
+                  <IoCreate color='#ff9346'/>
                   My Added Jobs
                 </Link>
               </li>
 
               <button
                 onClick={handleSignout}
-                className="px-5 py-2 bg-[#E3B23C] text-white rounded-lg font-semibold hover:bg-[#B97C16] transition cursor-pointer"
+                className="px-5 py-2 bg-[#ff9346] text-white rounded-lg font-semibold hover:bg-[#ff6900] transition cursor-pointer"
               >
                 Sign Out
               </button>
@@ -101,12 +94,7 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="hidden md:flex justify-center items-center gap-4">
-            <input
-              onChange={e => handleTheme(e.target.checked)}
-              type="checkbox"
-              defaultChecked={localStorage.getItem('theme') === 'dark'}
-              className="toggle"
-            />
+            <ThemeToggle></ThemeToggle>
             <Link
               to="/auth/login"
               className="px-5 py-2 border-2 border-green-600 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 hover:border-green-700 transition"

@@ -5,7 +5,7 @@ const Logo = () => {
       <img src="/logo.png" alt="" className="h-7 w-7"/>
 
       {/* Text */}
-      <h1 className="text-3xl font-bold text-green-900 tracking-tight">
+      <h1 className="text-3xl font-bold text-green-900 dark:text-white tracking-tight">
         Freelify
       </h1>
     </div>
