@@ -45,13 +45,13 @@ const Navbar = () => {
         {loading ? (
           <HashLoader color="green" size={40} />
         ) : user ? (
-          <div className="hidden md:flex flex-col items-center space-y-2 relative group">
-            <div className='flex justify-center items-center gap-4'>
+          <div className="hidden md:flex flex-col items-center space-y-2 ">
+            <div className="flex justify-center items-center gap-4">
               <ThemeToggle></ThemeToggle>
               <button
                 popoverTarget="popover-1"
                 style={{ anchorName: '--anchor-1' }}
-                className="relative"
+                className="relative group"
               >
                 <img
                   src={
@@ -78,8 +78,11 @@ const Navbar = () => {
               <p className="text-sm ">{user?.email}</p>
 
               <li>
-                <Link to={'/myAddedJobs'} className='hover:bg-amber-50 hover:text-black'>
-                  <IoCreate color='#ff9346'/>
+                <Link
+                  to={'/myAddedJobs'}
+                  className="hover:bg-amber-50 hover:text-black"
+                >
+                  <IoCreate color="#ff9346" />
                   My Added Jobs
                 </Link>
               </li>
