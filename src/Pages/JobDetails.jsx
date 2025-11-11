@@ -5,14 +5,15 @@ import axios from 'axios';
 import useAuth from '../Hooks/useAuth';
 import Loading from '../Components/Loading/Loading';
 import toast from 'react-hot-toast';
-import Swal from 'sweetalert2';
 
 const JobDetails = () => {
   const { id } = useParams();
   const { user, loading, setLoading } = useAuth();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
+  const [isAccepted, setIsAccepted] = useState(false);
 
+  // ✅ Fetch job details
   useEffect(() => {
     axios
       .get(`http://localhost:3000/jobs/${id}`)
@@ -25,6 +26,19 @@ const JobDetails = () => {
         toast.error('Failed to load job details');
       });
   }, [id, setLoading]);
+
+  // ✅ Check if the user already accepted the job
+  useEffect(() => {
+    if (user) {
+      axios
+        .get(`http://localhost:3000/accepted-jobs?userEmail=${user.email}`)
+        .then(res => {
+          const alreadyAccepted = res.data.some(job => job.title === job?.title && job.coverImage === job?.coverImage);
+          setIsAccepted(alreadyAccepted);
+        })
+        .catch(err => console.error('Failed to check accepted job:', err));
+    }
+  }, [user, id]);
 
   // ✅ Accept Job
   const handleAcceptJob = () => {
@@ -53,6 +67,7 @@ const JobDetails = () => {
       .post('http://localhost:3000/accepted-jobs', acceptedJob)
       .then(() => {
         toast.success('Job accepted successfully!');
+        setIsAccepted(true); // 🔥 instantly reflect change
         navigate('/my-accepted-tasks');
       })
       .catch(() => toast.error('Failed to accept job'));
@@ -113,9 +128,15 @@ const JobDetails = () => {
             {!isOwner && (
               <button
                 onClick={handleAcceptJob}
-                className="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                disabled={isAccepted}
+                className={`px-6 py-3 rounded-lg font-semibold text-white transition-all duration-300 
+                  ${
+                    isAccepted
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-[1.02]'
+                  }`}
               >
-                Accept Job
+                {isAccepted ? 'Accepted' : 'Accept Job'}
               </button>
             )}
 

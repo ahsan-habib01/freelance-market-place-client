@@ -1,16 +1,30 @@
-# React + Vite
+# 🧑‍💻 Freelify – Freelancing Marketplace Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Live Site:** [https://freelance-market-place-7a5e9.web.app/](https://freelance-market-place-7a5e9.web.app/)
 
-Currently, two official plugins are available:
+Freelify is a modern freelancing marketplace that connects skilled freelancers with clients across the globe. The platform provides a smooth experience for posting jobs, hiring freelancers, and managing freelance projects — all in one place.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Dynamic Job Listings:** Browse freelance job categories with detailed project information.  
+- **Secure Authentication:** Firebase-powered login and registration system for freelancers and clients.  
+- **Responsive Design:** Fully optimized for mobile, tablet, and desktop views.  
+- **Interactive UI:** Built with Tailwind CSS and Framer Motion for stunning animations and transitions.  
+- **Modern Tech Stack:** MERN (MongoDB, Express.js, React, Node.js) based architecture for scalability and performance.  
+- **Theme Support:** Light and dark modes with brand color gradients (`#ff9346` & `#ff6900`).  
+- **Fast Performance:** Deployed on Vercel with optimized image loading and code-splitting.  
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🧩 Tech Stack
+
+- **Frontend:** React.js, Tailwind CSS, DaisyUI, Framer Motion  
+- **Backend:** Node.js, Express.js, MongoDB  
+- **Authentication:** Firebase Authentication  
+- **Deployment:** Firebase (Client), Vercel (Server)
+
+---
+
+
