@@ -92,6 +92,7 @@ const JobDetails = () => {
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-[#fff3ea] via-[#fff7f0] to-[#fffaf7] dark:from-[#1a1a1a] dark:via-[#111] dark:to-[#000] py-12 px-4">
+      <title>{job?.title}</title>
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}

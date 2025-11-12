@@ -64,6 +64,7 @@ const UpdateJob = () => {
       className="min-h-screen py-16 px-4 bg-gradient-to-br from-[#ffebe0] via-[#fff0e5] to-[#fff5ec]
         dark:from-gray-800 dark:via-[#14181f] dark:to-[#1a1f27]"
     >
+      <title>Update Your Job - Freelify</title>
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

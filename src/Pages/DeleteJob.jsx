@@ -51,6 +51,7 @@ const DeleteJob = () => {
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#ffebe0] via-[#fff0e5] to-[#fff5ec]
         dark:from-gray-800 dark:via-[#14181f] dark:to-[#1a1f27] px-6 py-12"
     >
+      <title>Delete Your Job - Freelify</title>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

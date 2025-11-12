@@ -48,6 +48,7 @@ const AddJob = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fff5ec] via-[#fff0e5] to-[#ffebe0] dark:from-[#0f1116] dark:via-[#14181f] dark:to-[#1a1f27] flex justify-center items-center py-12 px-4">
+      <title>Add a Job for Freelancers - Freelify</title>
       <div className="w-full max-w-3xl bg-white/10 dark:bg-white/5 backdrop-blur-lg rounded-2xl shadow-[0_0_30px_-10px_rgba(255,105,0,0.3)] border border-white/10 p-8">
         <h2 className="text-4xl font-bold text-center text-[#ff6900] dark:text-[#ff9346] mb-3">
           Post a New Job

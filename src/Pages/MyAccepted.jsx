@@ -56,6 +56,7 @@ const MyAccepted = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fff5ec] via-[#fff0e5] to-[#ffebe0] dark:from-[#0f1116] dark:via-[#14181f] dark:to-[#1a1f27] py-12 px-4">
+      <title>Check Your Accepted Task - Freelify</title>
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

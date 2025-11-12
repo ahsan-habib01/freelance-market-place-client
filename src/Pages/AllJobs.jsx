@@ -30,6 +30,7 @@ const AllJobs = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] dark:from-[#0f172a] dark:to-[#020617] py-10 px-4 md:px-10">
+      <title>Explore All Jobs - Freelify</title>
       <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
         <h2 className="text-3xl font-bold text-[#ff6900] dark:text-[#ff9346]">
           All Freelance Jobs
