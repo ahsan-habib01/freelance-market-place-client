@@ -25,7 +25,7 @@ const Footer = () => {
           <ul className="space-y-2">
             <li>
               <Link
-                to="/about"
+                to=""
                 className="text-black/90 dark:text-white/90 hover:text-[#ff9346] hover:translate-x-1 inline-block transition-all duration-300"
               >
                 About
@@ -33,7 +33,7 @@ const Footer = () => {
             </li>
             <li>
               <Link
-                to="/contact"
+                to=""
                 className="text-black/90 dark:text-white/90 hover:text-[#ff9346] hover:translate-x-1 inline-block transition-all duration-300"
               >
                 Contact
@@ -41,7 +41,7 @@ const Footer = () => {
             </li>
             <li>
               <Link
-                to="/privacy-policy"
+                to=""
                 className="text-black/90 dark:text-white/90 hover:text-[#ff9346] hover:translate-x-1 inline-block transition-all duration-300"
               >
                 Privacy Policy
@@ -67,7 +67,7 @@ const Footer = () => {
                 href={social.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-white/10 hover:bg-[#ff9346]/20 hover:text-[#ff9346] text-black/90 dark:text-white/90 hover:scale-110 transform transition-all duration-300"
+                className="p-2 rounded-full bg-black/10 dark:bg-white/10 hover:bg-[#ff9346]/20 hover:text-[#ff9346] text-black/90 dark:text-white/90 hover:scale-110 transform transition-all duration-300"
               >
                 {social.icon}
               </a>
@@ -77,7 +77,7 @@ const Footer = () => {
       </div>
 
       {/* Divider */}
-      <div className="w-11/12 mx-auto border-t border-black/20 text-center py-4 text-sm text-black/90 dark:text-white/90">
+      <div className="w-11/12 mx-auto border-t border-black/20 dark:border-white/20 text-center py-4 text-sm text-black/90 dark:text-white/90">
         © 2025{' '}
         <span className="font-semibold text-black/90 dark:text-white/90 hover:text-[#ff9346] transition-colors duration-300">
           Freelify

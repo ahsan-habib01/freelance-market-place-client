@@ -6,23 +6,27 @@ import JobCard from '../Components/JobCard/JobCard';
 
 const AllJobs = () => {
   const [jobs, setJobs] = useState([]);
-  const [sortOrder, setSortOrder] = useState('desc'); // default: newest first
-  const { loading } = useAuth();
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [isLoading, setIsLoading] = useState(true); // 🔹 new loading state
+  const { loading: authLoading } = useAuth();
   const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
+        setIsLoading(true); // start loading before fetch
         const res = await axiosSecure.get(`/jobs?sort=${sortOrder}`);
         setJobs(res.data);
       } catch (err) {
         console.error('Error fetching jobs:', err);
+      } finally {
+        setIsLoading(false); // stop loading
       }
     };
     fetchJobs();
   }, [sortOrder, axiosSecure]);
 
-  if (loading) return <Loading />;
+  if (authLoading || isLoading) return <Loading />; // 🔹 show loading
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] dark:from-[#0f172a] dark:to-[#020617] py-10 px-4 md:px-10">
@@ -47,7 +51,9 @@ const AllJobs = () => {
         {jobs.length > 0 ? (
           jobs.map(job => <JobCard key={job._id} job={job} />)
         ) : (
-          <p className="text-center text-gray-600">No jobs found.</p>
+          <p className="text-center text-gray-600 dark:text-gray-300">
+            No jobs found.
+          </p>
         )}
       </div>
     </div>

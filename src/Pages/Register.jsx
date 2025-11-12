@@ -76,7 +76,10 @@ const Register = () => {
   };
 
   return (
-    <section className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#0b0f13] py-16">
+    <section
+      className="flex items-center justify-center min-h-screen  bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] 
+  dark:from-[#0f172a] dark:to-[#020617] py-16"
+    >
       <title>Create Your Account - Freelify</title>
       <div className="w-11/12 max-w-md bg-white dark:bg-[#161b22] shadow-lg rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-[#ff6f3c] text-center mb-2">

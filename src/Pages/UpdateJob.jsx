@@ -60,7 +60,10 @@ const UpdateJob = () => {
   if (loading) return <Loading />;
 
   return (
-    <section className="min-h-screen py-16 px-4 bg-gradient-to-br from-[#fff4ec] via-[#fff7f3] to-[#fffaf8] dark:from-[#0f0f0f] dark:via-[#161616] dark:to-[#1c1c1c]">
+    <section
+      className="min-h-screen py-16 px-4 bg-gradient-to-br from-[#ffebe0] via-[#fff0e5] to-[#fff5ec]
+        dark:from-gray-800 dark:via-[#14181f] dark:to-[#1a1f27]"
+    >
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

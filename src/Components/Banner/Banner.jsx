@@ -66,7 +66,7 @@ const Banner = () => {
           <img
             src={bannerSpin}
             alt=""
-            className="absolute -top-10  animate-spin [animation-duration:10s]"
+            className="hidden md:flex absolute -top-10  animate-spin [animation-duration:10s]"
           />
         </motion.div>
       </div>

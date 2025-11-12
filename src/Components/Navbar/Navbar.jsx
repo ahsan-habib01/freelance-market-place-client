@@ -36,7 +36,7 @@ const Navbar = () => {
         </div>
 
         <button
-          className="md:hidden p-2 rounded-lg hover:bg-green-200 transition"
+          className="md:hidden p-2 rounded-lg hover:bg-orange-400 transition"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <X size={26} /> : <Menu size={26} />}
@@ -100,7 +100,7 @@ const Navbar = () => {
             <ThemeToggle></ThemeToggle>
             <Link
               to="/auth/login"
-              className="px-5 py-2 border-2 border-[#ff6900] bg-gradient-to-r from-[#ff9346] to-[#ff6900] text-white rounded-lg font-semibold hover:bg-green-700 hover:border-[#ff9346] hover:shadow-lg hover:scale-105 transition-transform duration-300"
+              className="px-5 py-2 border-2 border-[#ff6900] bg-gradient-to-r from-[#ff9346] to-[#ff6900] text-white rounded-lg font-semibold hover:bg-[#ff6900] hover:border-[#ff9346] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Login
             </Link>
@@ -116,22 +116,25 @@ const Navbar = () => {
       </div>
 
       {menuOpen && (
-        <div className="md:hidden bg-green-50 border-t border-green-200 py-4 space-y-4 text-center ">
+        <div className="md:hidden bg-white dark:bg-gray-700 border-t border-white dark:border-gray-700 py-4 space-y-4 text-center ">
           <NavLinks />
           {user ? (
             <div className="space-y-3">
               <div>
                 <img
                   src={user?.photoURL || people}
-                  className="h-12 w-12 rounded-full border-2 border-green-400 mx-auto"
+                  className="h-12 w-12 rounded-full border-2 border-orange-400 mx-auto"
                   alt="User"
                 />
                 <p className="font-semibold mt-1">{user?.displayName}</p>
-                <p className="text-sm text-gray-600">{user?.email}</p>
+                <p className="text-sm text-gray-500">{user?.email}</p>
+              </div>
+              <div className=''>
+                <ThemeToggle></ThemeToggle>
               </div>
               <button
                 onClick={handleSignout}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+                className="px-6 py-2 bg-[#ff9346] text-white rounded-lg font-semibold hover:bg-[#ff6900] transition"
               >
                 Sign Out
               </button>
@@ -140,14 +143,14 @@ const Navbar = () => {
             <div className="flex flex-col gap-3 items-center">
               <Link
                 to="/auth/login"
-                className="w-3/4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+                className="w-3/4 py-2 bg-[#ff9346] text-white rounded-lg font-semibold hover:bg-[#ff6900] transition"
                 onClick={() => setMenuOpen(false)}
               >
                 Login
               </Link>
               <Link
                 to="/auth/register"
-                className="w-3/4 py-2 border-2 border-green-600 text-green-700 rounded-lg font-semibold hover:bg-green-600 hover:text-white transition"
+                className="w-3/4 py-2 border-2 border-[#ff9346] text-[#ff6900] rounded-lg font-semibold hover:bg-[#ff9346] hover:text-white transition"
                 onClick={() => setMenuOpen(false)}
               >
                 Register

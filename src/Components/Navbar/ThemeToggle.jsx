@@ -1,26 +1,36 @@
 import React, { useEffect, useState } from 'react';
 
 const ThemeToggle = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') || 'light'
+  );
 
+  // 🟠 Apply theme whenever it changes
   useEffect(() => {
-    const html = document.querySelector('html');
-    html.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const handleTheme = checked => {
-    setTheme(checked ? 'dark' : 'light');
+  // 🟠 Handle toggle change
+  const handleThemeChange = e => {
+    setTheme(e.target.checked ? 'dark' : 'light');
   };
 
   return (
-    <div>
+    <div className="flex items-center gap-2">
       <input
-        onChange={e => handleTheme(e.target.checked)}
+        id="theme-toggle"
         type="checkbox"
-        defaultChecked={localStorage.getItem('theme') === 'dark'}
-        className="toggle"
+        className="toggle toggle-warning"
+        onChange={handleThemeChange}
+        checked={theme === 'dark'} // ✅ controlled, not defaultChecked
       />
+      {/* <label
+        htmlFor="theme-toggle"
+        className="text-sm font-medium text-gray-600 dark:text-gray-300"
+      >
+        {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+      </label> */}
     </div>
   );
 };

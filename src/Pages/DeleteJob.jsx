@@ -47,7 +47,10 @@ const DeleteJob = () => {
   if (loading || !job) return <Loading />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff3ea] via-[#fff7f0] to-[#fffaf7] dark:from-[#1a1a1a] dark:via-[#111] dark:to-[#000] px-6 py-12">
+    <div
+      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#ffebe0] via-[#fff0e5] to-[#fff5ec]
+        dark:from-gray-800 dark:via-[#14181f] dark:to-[#1a1f27] px-6 py-12"
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
