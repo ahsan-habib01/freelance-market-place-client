@@ -16,7 +16,7 @@ const JobDetails = () => {
   // ✅ Fetch job details
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/jobs/${id}`)
+      .get(`https://freelify-market-place-server.vercel.app/jobs/${id}`)
       .then(res => {
         setJob(res.data);
         setLoading(false);
@@ -31,9 +31,14 @@ const JobDetails = () => {
   useEffect(() => {
     if (user) {
       axios
-        .get(`http://localhost:3000/accepted-jobs?userEmail=${user.email}`)
+        .get(
+          `https://freelify-market-place-server.vercel.app/accepted-jobs?userEmail=${user.email}`
+        )
         .then(res => {
-          const alreadyAccepted = res.data.some(job => job.title === job?.title && job.coverImage === job?.coverImage);
+          const alreadyAccepted = res.data.some(
+            job =>
+              job.title === job?.title && job.coverImage === job?.coverImage
+          );
           setIsAccepted(alreadyAccepted);
         })
         .catch(err => console.error('Failed to check accepted job:', err));
@@ -64,7 +69,10 @@ const JobDetails = () => {
     };
 
     axios
-      .post('http://localhost:3000/accepted-jobs', acceptedJob)
+      .post(
+        'https://freelify-market-place-server.vercel.app/accepted-jobs',
+        acceptedJob
+      )
       .then(() => {
         toast.success('Job accepted successfully!');
         setIsAccepted(true); // 🔥 instantly reflect change

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://freelify-market-place-server.vercel.app',
 });
 
 const useAxiosSecure = () => {
@@ -33,7 +33,7 @@ const useAxiosSecure = () => {
       error => {
         const status = error.status;
         if (status === 401 || status === 403) {
-          console.log('log out the user for bad request');
+          // console.log('log out the user for bad request');
           signOutUser().then(() => {
             navigate('/auth/login');
           });

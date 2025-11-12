@@ -17,7 +17,7 @@ const DeleteJob = () => {
   // ✅ Fetch job data for display
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/jobs/${id}`)
+      .get(`https://freelify-market-place-server.vercel.app/jobs/${id}`)
       .then(res => setJob(res.data))
       .catch(() => toast.error('Failed to fetch job details'));
   }, [id]);
@@ -31,7 +31,9 @@ const DeleteJob = () => {
 
     setDeleting(true);
     try {
-      await axios.delete(`http://localhost:3000/deleteJob/${id}`);
+      await axios.delete(
+        `https://freelify-market-place-server.vercel.app/deleteJob/${id}`
+      );
       toast.success('Job deleted successfully!');
       navigate('/myAddedJobs');
     } catch (error) {
