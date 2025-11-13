@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { use,  useState } from 'react';
 import Logo from './Logo';
 import NavLinks from './NavLinks';
 import { Link, useNavigate } from 'react-router';

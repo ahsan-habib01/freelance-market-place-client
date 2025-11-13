@@ -56,7 +56,7 @@ const Banner = () => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
-          className="flex-1 relative"
+          className="relative inline-block"
         >
           <img
             src={bannerImg}
@@ -66,7 +66,7 @@ const Banner = () => {
           <img
             src={bannerSpin}
             alt=""
-            className="hidden md:flex absolute -top-10  animate-spin [animation-duration:10s]"
+            className="hidden md:flex absolute -top-10 -left-10 m-auto  animate-spin [animation-duration:10s]"
           />
         </motion.div>
       </div>
