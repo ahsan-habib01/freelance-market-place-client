@@ -7,7 +7,7 @@ import bannerSpin from '../../assets/banner-shape-2.svg';
 const Banner = () => {
   return (
     <section
-      className="py-20 text-gray-900 dark:text-white 
+      className="py-15 text-gray-900 dark:text-white 
   bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] 
   dark:from-[#0f172a] dark:to-[#020617]"
     >
@@ -26,11 +26,11 @@ const Banner = () => {
             />
             Freelance Marketplace
           </span>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 py-5">
+          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-4 py-5">
             Empower Your Work with{' '}
             <span className="text-[#ff6900]">Freelify</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-200 mb-8">
+          <p className="text-lg text-gray-700 dark:text-gray-200 mb-8">
             A trusted freelance marketplace where talent meets opportunity.
             Build your career, connect with clients, and grow with confidence.
           </p>
@@ -38,13 +38,13 @@ const Banner = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Link
               to="/allJobs"
-              className="inline-block px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-105 transition-transform duration-300"
+              className="inline-block px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Explore Jobs
             </Link>
             <Link
               to="/addJob"
-              className="px-8 py-3 border-2 border-[#ff6900] font-semibold rounded-lg hover:bg-[#ff5506] hover:shadow-lg hover:scale-105 transition-transform duration-300"
+              className="px-4 py-2 border-2 border-[#ff6900] font-semibold rounded-lg hover:bg-[#ff5506] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Create a Job
             </Link>
@@ -61,7 +61,7 @@ const Banner = () => {
           <img
             src={bannerImg}
             alt="Freelancer"
-            className="w-full h-130 object-cover max-w-md mx-auto drop-shadow-2xl rounded-lg "
+            className="w-full h-120 object-cover max-w-md mx-auto drop-shadow-2xl rounded-lg "
           />
           <img
             src={bannerSpin}

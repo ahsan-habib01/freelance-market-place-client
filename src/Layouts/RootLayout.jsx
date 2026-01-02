@@ -3,7 +3,7 @@ import { Outlet } from 'react-router';
 import Navbar from '../Components/Navbar/Navbar';
 import Footer from '../Components/Footer/Footer';
 import { Toaster } from 'react-hot-toast';
-import ScrollToTop from '../Static/ScrollToTop';
+import ScrollToTop from '../Components/Static/ScrollToTop';
 
 const RootLayout = () => {
   return (

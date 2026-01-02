@@ -4,10 +4,10 @@ import { NavLink } from 'react-router';
 const NavLinks = () => {
   const links = [
     { name: 'Home', path: '/' },
-    { name: 'All Jobs', path: '/allJobs' },
-    { name: 'Add a Job', path: '/addJob' },
+    { name: 'All Jobs', path: '/all-jobs' },
+    { name: 'Add a Job', path: '/add-job' },
     { name: 'My Accepted Tasks', path: '/my-accepted-tasks' },
-    { name: 'My Added Jobs', path: '/myAddedJobs' },
+    { name: 'My Added Jobs', path: '/my-added-jobs' },
   ];
 
   return (

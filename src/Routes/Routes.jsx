@@ -26,19 +26,15 @@ const router = createBrowserRouter([
         Component: Home,
       },
       {
-        path: 'allJobs',
+        path: 'all-jobs',
         Component: AllJobs,
       },
       {
-        path: 'allJobs/:id',
-        element: (
-          <PrivateRoute>
-            <JobDetails></JobDetails>
-          </PrivateRoute>
-        ),
+        path: 'all-jobs/:id',
+        element: <JobDetails></JobDetails>,
       },
       {
-        path: 'addJob',
+        path: 'add-job',
         element: (
           <PrivateRoute>
             <AddJob></AddJob>
@@ -46,7 +42,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'myAddedJobs',
+        path: 'my-added-jobs',
         element: (
           <PrivateRoute>
             <MyAddedJobs></MyAddedJobs>
@@ -70,7 +66,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'deleteJob/:id',
+        path: 'delete-job/:id',
         element: (
           <PrivateRoute>
             <DeleteJob></DeleteJob>
