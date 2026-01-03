@@ -46,7 +46,7 @@ const JobCard = ({ job, index }) => {
         </p>
 
         {/* View Details Button */}
-        <Link to={`/allJobs/${_id}`}>
+        <Link to={`/all-jobs/${_id}`}>
           <motion.button
             whileTap={{ scale: 0.97 }}
             className="mt-3 w-full py-2.5 bg-gradient-to-r from-[#ff9346] to-[#ff6900] text-white font-semibold rounded-xl 

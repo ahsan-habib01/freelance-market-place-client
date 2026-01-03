@@ -1,11 +1,12 @@
-import { useState } from 'react';
 import toast from 'react-hot-toast';
-import useAuth from '../Hooks/useAuth';
-import useAxiosSecure from '../Hooks/useAxiosSecure';
+import useAuth from '../../../Hooks/useAuth';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure';
+import { useNavigate } from 'react-router';
 
 const AddJob = () => {
   const { user, loading, setLoading } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
   const handleAddJob = async e => {
     e.preventDefault();
@@ -35,6 +36,7 @@ const AddJob = () => {
       if (data?.insertedId) {
         toast.success('Job added successfully!');
         form.reset();
+        navigate('/dashboard/my-jobs');
       } else {
         toast.error('Failed to add job.');
       }

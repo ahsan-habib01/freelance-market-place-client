@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import useAuth from '../Hooks/useAuth';
-import Loading from '../Components/Loading/Loading';
+import useAuth from '../../../Hooks/useAuth';
+import Loading from '../../../Components/Loading/Loading';
 import { Trash2 } from 'lucide-react';
 
 const DeleteJob = () => {
@@ -35,7 +35,7 @@ const DeleteJob = () => {
         `https://freelify-market-place-server.vercel.app/deleteJob/${id}`
       );
       toast.success('Job deleted successfully!');
-      navigate('/myAddedJobs');
+      navigate('/dashboard/my-jobs');
     } catch (error) {
       console.error(error);
       toast.error('Failed to delete job!');

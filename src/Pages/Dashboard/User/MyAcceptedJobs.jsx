@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import useAuth from '../Hooks/useAuth';
-import useAxiosSecure from '../Hooks/useAxiosSecure';
-import Loading from '../Components/Loading/Loading';
+import useAuth from '../../../Hooks/useAuth';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure';
+import Loading from '../../../Components/Loading/Loading';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { CheckCircle, XCircle } from 'lucide-react';
 
-const MyAccepted = () => {
+const MyAcceptedJobs = () => {
   const { user, loading } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [acceptedJobs, setAcceptedJobs] = useState([]);
@@ -142,4 +142,4 @@ const MyAccepted = () => {
   );
 };
 
-export default MyAccepted;
+export default MyAcceptedJobs;

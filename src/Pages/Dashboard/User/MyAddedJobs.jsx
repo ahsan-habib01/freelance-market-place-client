@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import useAuth from '../Hooks/useAuth';
-import useAxiosSecure from '../Hooks/useAxiosSecure';
-import Loading from '../Components/Loading/Loading';
-import JobCard from '../Components/JobCard/JobCard';
+import useAuth from '../../../Hooks/useAuth';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure';
+import Loading from '../../../Components/Loading/Loading';
+import JobCard from '../../../Components/JobCard/JobCard';
 
 const MyAddedJobs = () => {
   const { user, loading } = useAuth();
@@ -21,6 +21,7 @@ const MyAddedJobs = () => {
         // console.log('Fetched added jobs', res.data);
         setJobs(res.data);
         setIsFetching(false);
+        
       })
       .catch(err => {
         console.error('Error fetching my added jobs:', err);

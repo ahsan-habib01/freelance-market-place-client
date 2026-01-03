@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import useAxiosSecure from '../Hooks/useAxiosSecure';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure';
 import Swal from 'sweetalert2';
-import Loading from '../Components/Loading/Loading';
-import useAuth from '../Hooks/useAuth';
+import Loading from '../../../Components/Loading/Loading';
+import useAuth from '../../../Hooks/useAuth';
 import { motion } from 'framer-motion';
 
 const UpdateJob = () => {
@@ -38,7 +38,7 @@ const UpdateJob = () => {
     };
 
     axiosSecure
-      .put(`/updateJob/${id}`, updatedJob)
+      .put(`/dashboard/update-job/${id}`, updatedJob)
       .then(res => {
         if (res.data.modifiedCount > 0) {
           Swal.fire({
@@ -47,7 +47,7 @@ const UpdateJob = () => {
             icon: 'success',
             confirmButtonColor: '#ff6900',
           });
-          navigate('/myAddedJobs');
+          navigate('/dashboard/my-added-jobs');
         } else {
           Swal.fire('No Change', 'No fields were updated.', 'info');
         }

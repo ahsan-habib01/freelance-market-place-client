@@ -1,4 +1,4 @@
-import React, { use, useRef, useState } from 'react';
+import React, { use, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../Contexts/AuthContext';
@@ -7,12 +7,14 @@ import toast from 'react-hot-toast';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const emailRef = useRef();
+  const [isLoading, setIsLoading] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { setUser, signIn, googleSignIn, setLoading } = use(AuthContext);
+  const { signIn, googleSignIn } = use(AuthContext);
 
   const validatePassword = password => {
     if (password.length < 6) return 'Must be at least 6 characters';
@@ -27,50 +29,43 @@ const Login = () => {
     setPasswordError(validatePassword(value));
   };
 
-  const handleLogin = e => {
+  const handleLogin = async e => {
     e.preventDefault();
-    const email = e.target.email?.value;
-    const error = validatePassword(password);
 
+    const error = validatePassword(password);
     if (error) {
       setPasswordError(error);
       return;
     }
+
     setPasswordError('');
+    setIsLoading(true);
 
-    signIn(email, password)
-      .then(res => {
-        const user = res.user;
-        setUser(user);
-        setLoading(false);
-        navigate(`${location.state ? location.state : '/'}`);
-      })
-      .catch(e => {
-        toast.error(e.message);
-        setLoading(false);
-      });
+    try {
+      await signIn(email, password);
+      navigate(location.state?.from || '/');
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    googleSignIn()
-      .then(res => {
-        const user = res.user;
-        setUser(user);
-        setLoading(false);
-        navigate(`${location.state ? location.state : '/'}`);
-      })
-      .catch(e => {
-        toast.error(e.message);
-        setLoading(false);
-      });
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      await googleSignIn();
+      navigate(location.state?.from || '/');
+    } catch (error) {
+      console.error('Google login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
-    <section
-      className="flex items-center justify-center min-h-screen  bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] 
-  dark:from-[#0f172a] dark:to-[#020617] py-16"
-    >
-      <title>Login to Continue - Freelify</title>
+    <section className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] dark:from-[#0f172a] dark:to-[#020617] py-16">
       <div className="w-11/12 max-w-md bg-white dark:bg-[#161b22] shadow-lg rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-[#ff6f3c] text-center mb-2">
           Welcome Back
@@ -88,8 +83,9 @@ const Login = () => {
             <input
               type="email"
               name="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email"
-              ref={emailRef}
               required
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500]"
             />
@@ -137,14 +133,15 @@ const Login = () => {
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-[#ff6f3c] text-white font-semibold py-2 rounded-lg hover:bg-[#ff9346] dark:hover:bg-[#ff6900] transition cursor-pointer"
+            disabled={isLoading}
+            className="w-full bg-[#ff6f3c] text-white font-semibold py-2 rounded-lg hover:bg-[#ff9346] dark:hover:bg-[#ff6900] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="flex items-center justify-center my-1">
+        <div className="flex items-center justify-center my-4">
           <div className="w-1/4 h-px bg-gray-300 dark:bg-gray-600"></div>
           <span className="mx-3 text-gray-500 dark:text-gray-400 font-medium">
             or
@@ -155,7 +152,8 @@ const Login = () => {
         {/* Google Login */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer disabled:opacity-50"
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -166,7 +164,7 @@ const Login = () => {
         </button>
 
         <p className="text-center text-gray-700 dark:text-gray-300 mt-6">
-          Don’t have an account?{' '}
+          Don't have an account?{' '}
           <Link
             to="/auth/register"
             className="text-[#ff6f3c] font-semibold hover:text-[#ff9346]"

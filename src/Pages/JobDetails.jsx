@@ -76,14 +76,14 @@ const JobDetails = () => {
       .then(() => {
         toast.success('Job accepted successfully!');
         setIsAccepted(true); // 🔥 instantly reflect change
-        navigate('/my-accepted-tasks');
+        navigate('/dashboard/my-accepted-jobs');
       })
       .catch(() => toast.error('Failed to accept job'));
   };
 
   // ✅ Delete Job
   const handleDeleteJob = () => {
-    navigate(`/deleteJob/${id}`);
+    navigate(`/dashboard/delete-job/${id}`);
   };
 
   if (loading) return <Loading />;
@@ -151,7 +151,7 @@ const JobDetails = () => {
 
             {isOwner && (
               <>
-                <Link to={`/update-job/${id}`}>
+                <Link to={`dashboard/update-job/${id}`}>
                   <button className="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#38bdf8] to-[#0ea5e9] hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
                     Update Job
                   </button>

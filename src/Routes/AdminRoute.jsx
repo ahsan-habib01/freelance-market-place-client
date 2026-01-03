@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router';
 import { AuthContext } from '../Contexts/AuthContext';
 import Loading from '../Components/Loading/Loading';
 
-const PrivateRoute = ({ children }) => {
+const AdminRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
@@ -11,13 +11,13 @@ const PrivateRoute = ({ children }) => {
     return <Loading />;
   }
 
-  if (user) {
+  // Check if user is logged in AND has admin role
+  if (user && user.role === 'admin') {
     return children;
   }
 
-  return (
-    <Navigate to="/auth/login" state={{ from: location.pathname }} replace />
-  );
+  // If not admin, redirect to dashboard home
+  return <Navigate to="/dashboard" state={{ from: location }} replace />;
 };
 
-export default PrivateRoute;
+export default AdminRoute;
