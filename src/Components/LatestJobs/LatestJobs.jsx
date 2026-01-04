@@ -59,7 +59,7 @@ const LatestJobs = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.8 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-8 w-11/12 mx-auto"
+        className="grid grid-cols-1 md:grid-cols-4 gap-8 w-11/12 mx-auto"
       >
         {jobs.length > 0 ? (
           jobs.map(job => (
