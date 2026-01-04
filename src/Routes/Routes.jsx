@@ -6,8 +6,9 @@ import Login from '../Pages/Login';
 import Register from '../Pages/Register';
 import AllJobs from '../Pages/AllJobs';
 import JobDetails from '../Pages/JobDetails';
-import About from '../Pages/About';
-import Contact from '../Pages/Contact';
+import About from '../Pages/AboutPage';
+import ContactPage from '../Pages/ContactPage';
+// import AboutPage from '../Pages/AboutPage';
 import Error from '../Components/Error/Error';
 import Loading from '../Components/Loading/Loading';
 import PrivateRoute from './PrivateRoute';
@@ -28,6 +29,10 @@ import ManageUsers from '../Pages/Dashboard/Admin/ManageUsers';
 import ManageJobs from '../Pages/Dashboard/Admin/ManageJobs';
 import ManageCategories from '../Pages/Dashboard/Admin/ManageCategories';
 import AdminProfile from '../Pages/Dashboard/Admin/AdminProfile';
+import AboutPage from '../Pages/AboutPage';
+import PrivacyPolicyPage from '../Pages/PrivacyPolicyPage';
+import FAQPage from '../Pages/FAQPage';
+import { TermsOfServicePage } from '../Pages/TermsOfServicePage';
 
 const router = createBrowserRouter([
   {
@@ -50,11 +55,23 @@ const router = createBrowserRouter([
       },
       {
         path: 'about',
-        element: <About />,
+        element: <AboutPage />,
       },
       {
         path: 'contact',
-        element: <Contact />,
+        element: <ContactPage />,
+      },
+      {
+        path: 'privacy-policy',
+        element: <PrivacyPolicyPage />,
+      },
+      {
+        path: 'faq',
+        element: <FAQPage />,
+      },
+      {
+        path: 'terms-of-service',
+        element: <TermsOfServicePage />,
       },
       {
         path: 'auth/login',

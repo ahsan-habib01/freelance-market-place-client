@@ -3,7 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FiPlus, FiTrash2, FiEdit2, FiX } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const ManageCategories = () => {
   const [categories, setCategories] = useState([]);

@@ -55,7 +55,7 @@ const DashboardLayout = () => {
   // Combine menu items based on role
   const menuItems =
     user?.role === 'admin'
-      ? [...userMenuItems, ...adminMenuItems]
+      ? [ ...adminMenuItems]
       : userMenuItems;
 
   const isActive = path => location.pathname === path;

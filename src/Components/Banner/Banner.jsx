@@ -37,7 +37,7 @@ const Banner = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Link
-              to="/allJobs"
+              to="/all-jobs"
               className="inline-block px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-105 transition-transform duration-300"
             >
               Explore Jobs

@@ -3,7 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FiTrash2, FiEdit2, FiSearch } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);

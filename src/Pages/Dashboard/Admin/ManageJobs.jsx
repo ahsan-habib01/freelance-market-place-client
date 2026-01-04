@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { FiTrash2, FiEye, FiSearch, FiFilter } from 'react-icons/fi';
 import { Link } from 'react-router';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);

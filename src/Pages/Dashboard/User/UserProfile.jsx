@@ -1,13 +1,21 @@
-import React, { use, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../Contexts/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { FiEdit2, FiSave, FiX, FiUser, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import {
+  FiEdit2,
+  FiSave,
+  FiX,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+} from 'react-icons/fi';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const UserProfile = () => {
-  const { user, profileUpdate } = use(AuthContext);
+  const { user, profileUpdate } = useContext(AuthContext); // ✅ Fixed: use useContext
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -22,12 +30,16 @@ const UserProfile = () => {
   const [skillInput, setSkillInput] = useState('');
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (user?.email) {
+      fetchProfile();
+    }
+  }, [user]);
 
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching profile for:', user?.email);
+
       const response = await axios.get(
         `${API_URL}/users/profile/${user?.email}`,
         {
@@ -35,10 +47,12 @@ const UserProfile = () => {
         }
       );
 
+      console.log('Profile data received:', response.data);
+
       setProfileData({
-        name: response.data.name || '',
-        email: response.data.email || '',
-        photoURL: response.data.photoURL || '',
+        name: response.data.name || user?.displayName || '',
+        email: response.data.email || user?.email || '',
+        photoURL: response.data.photoURL || user?.photoURL || '',
         bio: response.data.bio || '',
         phone: response.data.phone || '',
         location: response.data.location || '',
@@ -46,13 +60,14 @@ const UserProfile = () => {
       });
     } catch (error) {
       console.error('Failed to fetch profile:', error);
+      console.error('Error details:', error.response?.data);
       toast.error('Failed to load profile');
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setProfileData((prev) => ({
+    setProfileData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -60,7 +75,7 @@ const UserProfile = () => {
 
   const handleAddSkill = () => {
     if (skillInput.trim() && !profileData.skills.includes(skillInput.trim())) {
-      setProfileData((prev) => ({
+      setProfileData(prev => ({
         ...prev,
         skills: [...prev.skills, skillInput.trim()],
       }));
@@ -68,20 +83,25 @@ const UserProfile = () => {
     }
   };
 
-  const handleRemoveSkill = (skillToRemove) => {
-    setProfileData((prev) => ({
+  const handleRemoveSkill = skillToRemove => {
+    setProfileData(prev => ({
       ...prev,
-      skills: prev.skills.filter((skill) => skill !== skillToRemove),
+      skills: prev.skills.filter(skill => skill !== skillToRemove),
     }));
   };
 
   const handleSave = async () => {
     setLoading(true);
+    console.log('Starting save process...');
+
     try {
       const token = localStorage.getItem('token');
-      
-      // Update backend
-      await axios.put(
+      console.log('Token exists:', !!token);
+      console.log('Updating profile for:', user?.email);
+
+      // Update backend first
+      console.log('Sending data to backend:', profileData);
+      const response = await axios.put(
         `${API_URL}/users/profile/${user?.email}`,
         {
           name: profileData.name,
@@ -95,16 +115,40 @@ const UserProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log('Backend update response:', response.data);
 
-      // Update Firebase profile
-      await profileUpdate(profileData.name, profileData.photoURL);
+      // Update Firebase profile only if profileUpdate exists
+      if (profileUpdate) {
+        console.log('Updating Firebase profile...');
+        await profileUpdate(profileData.name, profileData.photoURL);
+        console.log('Firebase profile updated');
+      } else {
+        console.warn('profileUpdate function not available');
+      }
 
       toast.success('Profile updated successfully!');
       setIsEditing(false);
+      console.log('Save completed successfully');
     } catch (error) {
-      console.error('Failed to update profile:', error);
-      toast.error('Failed to update profile');
+      console.error('Save failed:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error message:', error.message);
+
+      // More specific error messages
+      if (error.response?.status === 401) {
+        toast.error('Unauthorized. Please login again.');
+      } else if (error.response?.status === 404) {
+        toast.error('Profile not found');
+      } else if (error.message.includes('Network Error')) {
+        toast.error('Network error. Check your connection.');
+      } else {
+        toast.error(
+          error.response?.data?.message || 'Failed to update profile'
+        );
+      }
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
     }
   };
@@ -114,8 +158,18 @@ const UserProfile = () => {
     setIsEditing(false);
   };
 
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 text-center">
+        <p className="text-gray-600 dark:text-gray-400">
+          Please login to view your profile
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -134,14 +188,15 @@ const UserProfile = () => {
             <button
               onClick={handleSave}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FiSave />
               {loading ? 'Saving...' : 'Save'}
             </button>
             <button
               onClick={handleCancel}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
             >
               <FiX />
               Cancel
@@ -163,6 +218,9 @@ const UserProfile = () => {
               src={profileData.photoURL || 'https://via.placeholder.com/150'}
               alt="Profile"
               className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover"
+              onError={e => {
+                e.target.src = 'https://via.placeholder.com/150';
+              }}
             />
           </div>
 
@@ -184,7 +242,7 @@ const UserProfile = () => {
                   />
                 ) : (
                   <p className="text-gray-900 dark:text-white text-lg font-semibold">
-                    {profileData.name}
+                    {profileData.name || 'Not set'}
                   </p>
                 )}
               </div>
@@ -293,8 +351,8 @@ const UserProfile = () => {
                   <input
                     type="text"
                     value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddSkill()}
+                    onChange={e => setSkillInput(e.target.value)}
+                    onKeyPress={e => e.key === 'Enter' && handleAddSkill()}
                     placeholder="Add a skill..."
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6f3c] dark:bg-gray-700 dark:text-white"
                   />

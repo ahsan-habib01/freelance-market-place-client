@@ -7,6 +7,9 @@ const NavLinks = () => {
     { name: 'All Jobs', path: '/all-jobs' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
+    { name: 'Privacy Policy', path: '/privacy-policy' },
+    { name: 'FAQ', path: '/faq' },
+    { name: 'Terms of Service', path: '/terms-of-service' },
   ];
 
   return (

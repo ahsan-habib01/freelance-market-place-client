@@ -25,7 +25,7 @@ const AboutFreelify = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#fff5ec] via-[#fff0e5] to-[#ffebe0] dark:from-[#0f1116] dark:via-[#14181f] dark:to-[#1a1f27] py-24 px-6">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#fff3e5] via-[#ffe8d2] to-[#ffd9b8] dark:from-gray-800 dark:via-[#181d23] dark:to-[#20262e] py-24 px-6">
       {/* Animated Background Glow */}
       <motion.div
         initial={{ opacity: 0 }}

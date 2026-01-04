@@ -23,7 +23,7 @@ import {
   FiClock,
 } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const DashboardHome = () => {
   const { user } = use(AuthContext);

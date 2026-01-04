@@ -13,7 +13,7 @@ import { auth } from './../Firebase/firebase.config';
 import axios from 'axios';
 
 const googleProvider = new GoogleAuthProvider();
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

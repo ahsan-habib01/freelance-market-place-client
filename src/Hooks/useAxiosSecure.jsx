@@ -1,49 +1,64 @@
 import axios from 'axios';
-import useAuth from './useAuth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import useAuth from './useAuth';
 
+// Create axios instance with base URL
 const instance = axios.create({
-  baseURL: 'https://freelify-market-place-server.vercel.app',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000', // Change to your backend URL
 });
 
 const useAxiosSecure = () => {
   const navigate = useNavigate();
-  const { user, signOutUser } = useAuth();
-
-  // set token in the header for all the api call using axiosSecure hook
+  const { signOutUser } = useAuth();
 
   useEffect(() => {
-    //  request interceptor
-
-    const requestInterceptor = instance.interceptors.request.use(config => {
-      const token = user?.accessToken;
-      if (token) {
-        config.headers.authorization = `Bearer ${token}`;
-      }
-
-      return config;
-    });
-
-    // response interceptor
-
-    instance.interceptors.response.use(res => {
-      return res;
-    }),
-      error => {
-        const status = error.status;
-        if (status === 401 || status === 403) {
-          // console.log('log out the user for bad request');
-          signOutUser().then(() => {
-            navigate('/auth/login');
-          });
+    // Request interceptor - Add JWT token to headers
+    const requestInterceptor = instance.interceptors.request.use(
+      config => {
+        const token = localStorage.getItem('token'); // Get JWT token from localStorage
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
-      };
+        return config;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
+
+    // Response interceptor - Handle errors
+    const responseInterceptor = instance.interceptors.response.use(
+      response => {
+        return response;
+      },
+      error => {
+        const status = error.response?.status;
+
+        // If unauthorized or forbidden, logout user
+        if (status === 401 || status === 403) {
+          console.log('Unauthorized access - logging out');
+          localStorage.removeItem('token'); // Clear token
+          signOutUser()
+            .then(() => {
+              navigate('/auth/login');
+            })
+            .catch(err => {
+              console.error('Logout error:', err);
+              navigate('/auth/login');
+            });
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup function - Remove interceptors
     return () => {
       instance.interceptors.request.eject(requestInterceptor);
-      instance.interceptors.response.eject();
+      instance.interceptors.response.eject(responseInterceptor);
     };
-  }, [user, signOutUser, navigate]);
+  }, [signOutUser, navigate]);
 
   return instance;
 };
