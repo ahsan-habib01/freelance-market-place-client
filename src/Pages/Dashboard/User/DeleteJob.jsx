@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+// ==================== FIXED DeleteJob.jsx ====================
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import useAuth from '../../../Hooks/useAuth';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure'; // ✅ Import axiosSecure
 import Loading from '../../../Components/Loading/Loading';
 import { Trash2 } from 'lucide-react';
 
@@ -11,18 +12,19 @@ const DeleteJob = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const axiosSecure = useAxiosSecure(); // ✅ Use axiosSecure for authenticated requests
   const [job, setJob] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // ✅ Fetch job data for display
+  // ✅ Fetch job data for display (public endpoint)
   useEffect(() => {
-    axios
-      .get(`https://freelify-market-place-server.vercel.app/jobs/${id}`)
-      .then(res => setJob(res.data))
+    fetch(`https://freelify-market-place-server.vercel.app/jobs/${id}`)
+      .then(res => res.json())
+      .then(data => setJob(data))
       .catch(() => toast.error('Failed to fetch job details'));
   }, [id]);
 
-  // ✅ Confirm deletion
+  // ✅ Confirm deletion - FIXED with axiosSecure
   const handleDeleteConfirm = async () => {
     if (!user || user.email !== job?.userEmail) {
       toast.error('You are not authorized to delete this job!');
@@ -31,14 +33,12 @@ const DeleteJob = () => {
 
     setDeleting(true);
     try {
-      await axios.delete(
-        `https://freelify-market-place-server.vercel.app/deleteJob/${id}`
-      );
+      await axiosSecure.delete(`/deleteJob/${id}`); // ✅ Use axiosSecure instead of axios
       toast.success('Job deleted successfully!');
       navigate('/dashboard/my-jobs');
     } catch (error) {
-      console.error(error);
-      toast.error('Failed to delete job!');
+      console.error('Delete error:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete job!');
     } finally {
       setDeleting(false);
     }
@@ -67,7 +67,7 @@ const DeleteJob = () => {
         <p className="text-gray-700 dark:text-gray-300 mb-6">
           Are you sure you want to permanently delete the job{' '}
           <span className="font-semibold text-[#ff6900] dark:text-[#ff9346]">
-            “{job.title}”
+            "{job.title}"
           </span>
           ? This action cannot be undone.
         </p>
@@ -76,7 +76,7 @@ const DeleteJob = () => {
           <button
             onClick={() => navigate(-1)}
             disabled={deleting}
-            className="px-6 py-2 rounded-lg font-semibold border border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+            className="px-6 py-2 rounded-lg font-semibold border border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all disabled:opacity-50"
           >
             Cancel
           </button>
@@ -84,7 +84,7 @@ const DeleteJob = () => {
           <button
             onClick={handleDeleteConfirm}
             disabled={deleting}
-            className="px-6 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-[1.02] transition-all"
+            className="px-6 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff9346] to-[#ff6900] hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50"
           >
             {deleting ? 'Deleting...' : 'Yes, Delete'}
           </button>

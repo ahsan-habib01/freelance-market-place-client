@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import useAuth from '../Hooks/useAuth';
 import useAxiosSecure from '../Hooks/useAxiosSecure';
 import Loading from '../Components/Loading/Loading';
 import JobCard from '../Components/JobCard/JobCard';
-import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Loader } from 'lucide-react';
 
 const AllJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -14,22 +14,29 @@ const AllJobs = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
 
   const { loading: authLoading } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const observerTarget = useRef(null);
 
   const jobsPerPage = 12;
-  const totalPages = Math.ceil(totalJobs / jobsPerPage);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
+  // Fetch jobs function
+  const fetchJobs = useCallback(
+    async (page, reset = false) => {
       try {
-        setIsLoading(true);
+        if (reset) {
+          setIsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
 
         // Build query parameters
         const params = new URLSearchParams({
-          page: currentPage.toString(),
+          page: page.toString(),
           limit: jobsPerPage.toString(),
           sort: sortOrder,
         });
@@ -39,33 +46,84 @@ const AllJobs = () => {
         if (locationFilter) params.append('location', locationFilter);
 
         const res = await axiosSecure.get(`/jobs?${params.toString()}`);
-        setJobs(res.data.jobs || res.data);
-        setTotalJobs(res.data.total || res.data.length);
+        const newJobs = res.data.jobs || res.data;
+        const total = res.data.total || res.data.length;
+
+        if (reset) {
+          setJobs(newJobs);
+        } else {
+          setJobs(prev => [...prev, ...newJobs]);
+        }
+
+        setTotalJobs(total);
+
+        // Check if there are more jobs to load
+        const loadedCount = reset
+          ? newJobs.length
+          : jobs.length + newJobs.length;
+        setHasMore(loadedCount < total);
       } catch (err) {
         console.error('Error fetching jobs:', err);
-        setJobs([]);
+        if (reset) {
+          setJobs([]);
+        }
       } finally {
         setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [
+      sortOrder,
+      searchTerm,
+      categoryFilter,
+      locationFilter,
+      axiosSecure,
+      jobs.length,
+    ]
+  );
+
+  // Initial load and filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+    setJobs([]);
+    fetchJobs(1, true);
+  }, [sortOrder, searchTerm, categoryFilter, locationFilter]);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isLoadingMore &&
+          !isLoading
+        ) {
+          const nextPage = currentPage + 1;
+          setCurrentPage(nextPage);
+          fetchJobs(nextPage, false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
       }
     };
-
-    fetchJobs();
-  }, [
-    currentPage,
-    sortOrder,
-    searchTerm,
-    categoryFilter,
-    locationFilter,
-    axiosSecure,
-  ]);
+  }, [hasMore, isLoadingMore, isLoading, currentPage, fetchJobs]);
 
   const handleSearch = e => {
     e.preventDefault();
-    setCurrentPage(1); // Reset to first page on new search
-  };
-
-  const handleFilterChange = () => {
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
+    setJobs([]);
+    fetchJobs(1, true);
   };
 
   const handleClearFilters = () => {
@@ -73,13 +131,7 @@ const AllJobs = () => {
     setCategoryFilter('');
     setLocationFilter('');
     setCurrentPage(1);
-  };
-
-  const goToPage = page => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    setJobs([]);
   };
 
   if (authLoading) return <Loading />;
@@ -131,10 +183,7 @@ const AllJobs = () => {
             {/* Category Filter */}
             <select
               value={categoryFilter}
-              onChange={e => {
-                setCategoryFilter(e.target.value);
-                handleFilterChange();
-              }}
+              onChange={e => setCategoryFilter(e.target.value)}
               className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#ff9346]"
             >
               <option value="">All Categories</option>
@@ -151,10 +200,7 @@ const AllJobs = () => {
             {/* Location Filter */}
             <select
               value={locationFilter}
-              onChange={e => {
-                setLocationFilter(e.target.value);
-                handleFilterChange();
-              }}
+              onChange={e => setLocationFilter(e.target.value)}
               className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#ff9346]"
             >
               <option value="">All Locations</option>
@@ -187,8 +233,7 @@ const AllJobs = () => {
 
         {/* Results Count */}
         <div className="text-gray-600 dark:text-gray-400 mb-4">
-          Showing {jobs.length > 0 ? (currentPage - 1) * jobsPerPage + 1 : 0} -{' '}
-          {Math.min(currentPage * jobsPerPage, totalJobs)} of {totalJobs} jobs
+          Showing {jobs.length} of {totalJobs} jobs
         </div>
       </div>
 
@@ -210,7 +255,7 @@ const AllJobs = () => {
           {/* Jobs Grid */}
           <div className="max-w-7xl mx-auto mb-8">
             {jobs.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {jobs.map(job => (
                   <JobCard key={job._id} job={job} />
                 ))}
@@ -230,77 +275,27 @@ const AllJobs = () => {
             )}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
-              {/* Previous Button */}
-              <button
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  currentPage === 1
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-white dark:bg-gray-800 text-[#ff6900] dark:text-[#ff9346] border border-[#ff9346] hover:bg-[#fff3ea] dark:hover:bg-gray-700'
-                }`}
-              >
-                <ChevronLeft size={20} />
-                Previous
-              </button>
-
-              {/* Page Numbers */}
-              <div className="flex items-center gap-2">
-                {[...Array(totalPages)].map((_, index) => {
-                  const pageNumber = index + 1;
-
-                  // Show first page, last page, current page, and pages around current
-                  if (
-                    pageNumber === 1 ||
-                    pageNumber === totalPages ||
-                    (pageNumber >= currentPage - 1 &&
-                      pageNumber <= currentPage + 1)
-                  ) {
-                    return (
-                      <button
-                        key={pageNumber}
-                        onClick={() => goToPage(pageNumber)}
-                        className={`w-10 h-10 rounded-lg transition-colors ${
-                          currentPage === pageNumber
-                            ? 'bg-[#ff6900] text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-[#fff3ea] dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {pageNumber}
-                      </button>
-                    );
-                  } else if (
-                    pageNumber === currentPage - 2 ||
-                    pageNumber === currentPage + 2
-                  ) {
-                    return (
-                      <span key={pageNumber} className="text-gray-500">
-                        ...
-                      </span>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-
-              {/* Next Button */}
-              <button
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  currentPage === totalPages
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-white dark:bg-gray-800 text-[#ff6900] dark:text-[#ff9346] border border-[#ff9346] hover:bg-[#fff3ea] dark:hover:bg-gray-700'
-                }`}
-              >
-                Next
-                <ChevronRight size={20} />
-              </button>
+          {/* Loading More Indicator */}
+          {isLoadingMore && (
+            <div className="flex justify-center items-center py-8">
+              <Loader className="w-8 h-8 text-[#ff6900] dark:text-[#ff9346] animate-spin" />
+              <span className="ml-3 text-gray-600 dark:text-gray-400">
+                Loading more jobs...
+              </span>
             </div>
           )}
+
+          {/* End of Results Message */}
+          {!hasMore && jobs.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">
+                You've reached the end of the list
+              </p>
+            </div>
+          )}
+
+          {/* Intersection Observer Target */}
+          <div ref={observerTarget} className="h-10"></div>
         </>
       )}
     </div>

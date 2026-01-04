@@ -1,15 +1,25 @@
 import React from 'react';
 import { NavLink } from 'react-router';
+import useAuth from '../../Hooks/useAuth';
 
 const NavLinks = () => {
+
+  const {user} = useAuth()
+
   const links = [
     { name: 'Home', path: '/' },
     { name: 'All Jobs', path: '/all-jobs' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
-    { name: 'Privacy Policy', path: '/privacy-policy' },
     { name: 'FAQ', path: '/faq' },
-    { name: 'Terms of Service', path: '/terms-of-service' },
+
+    // Conditionally add Privacy & Terms if user is logged in
+    ...(user
+      ? [
+          { name: 'Privacy Policy', path: '/privacy-policy' },
+          { name: 'Terms of Service', path: '/terms-of-service' },
+        ]
+      : []),
   ];
 
   return (

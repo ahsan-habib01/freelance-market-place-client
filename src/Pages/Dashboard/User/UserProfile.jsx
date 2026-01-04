@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../Contexts/AuthContext';
-import axios from 'axios';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure'; // ✅ Use axiosSecure instead
 import toast from 'react-hot-toast';
 import {
   FiEdit2,
@@ -12,10 +12,9 @@ import {
   FiMapPin,
 } from 'react-icons/fi';
 
-const API_URL = 'https://freelify-market-place-server.vercel.app';
-
 const UserProfile = () => {
-  const { user, profileUpdate } = useContext(AuthContext); // ✅ Fixed: use useContext
+  const { user, profileUpdate } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure(); // ✅ Use axiosSecure hook
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -37,17 +36,7 @@ const UserProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      console.log('Fetching profile for:', user?.email);
-
-      const response = await axios.get(
-        `${API_URL}/users/profile/${user?.email}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      console.log('Profile data received:', response.data);
+      const response = await axiosSecure.get(`/users/profile/${user?.email}`);
 
       setProfileData({
         name: response.data.name || user?.displayName || '',
@@ -60,7 +49,6 @@ const UserProfile = () => {
       });
     } catch (error) {
       console.error('Failed to fetch profile:', error);
-      console.error('Error details:', error.response?.data);
       toast.error('Failed to load profile');
     }
   };
@@ -92,17 +80,11 @@ const UserProfile = () => {
 
   const handleSave = async () => {
     setLoading(true);
-    console.log('Starting save process...');
 
     try {
-      const token = localStorage.getItem('token');
-      console.log('Token exists:', !!token);
-      console.log('Updating profile for:', user?.email);
-
-      // Update backend first
-      console.log('Sending data to backend:', profileData);
-      const response = await axios.put(
-        `${API_URL}/users/profile/${user?.email}`,
+      // ✅ Step 1: Update backend with timeout protection
+      const backendUpdatePromise = axiosSecure.put(
+        `/users/profile/${user?.email}`,
         {
           name: profileData.name,
           photoURL: profileData.photoURL,
@@ -110,37 +92,55 @@ const UserProfile = () => {
           phone: profileData.phone,
           location: profileData.location,
           skills: profileData.skills,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log('Backend update response:', response.data);
 
-      // Update Firebase profile only if profileUpdate exists
-      if (profileUpdate) {
-        console.log('Updating Firebase profile...');
-        await profileUpdate(profileData.name, profileData.photoURL);
-        console.log('Firebase profile updated');
-      } else {
-        console.warn('profileUpdate function not available');
+      // ✅ Add 10 second timeout
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      );
+
+      await Promise.race([backendUpdatePromise, timeoutPromise]);
+      console.log('Backend updated successfully');
+
+      // ✅ Step 2: Update Firebase profile (with error handling)
+      if (profileUpdate && typeof profileUpdate === 'function') {
+        try {
+          await Promise.race([
+            profileUpdate(profileData.name, profileData.photoURL),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error('Firebase update timeout')),
+                5000
+              )
+            ),
+          ]);
+          console.log('Firebase profile updated');
+        } catch (firebaseError) {
+          console.warn('Firebase update failed (non-critical):', firebaseError);
+          // Don't fail the whole operation if Firebase update fails
+        }
       }
 
       toast.success('Profile updated successfully!');
       setIsEditing(false);
-      console.log('Save completed successfully');
+      setLoading(false); // Set loading false before refreshing
+
+      // Refresh profile data (non-blocking)
+      fetchProfile().catch(error => {
+        console.error('Failed to refresh profile after update:', error);
+      });
     } catch (error) {
       console.error('Save failed:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      console.error('Error message:', error.message);
 
-      // More specific error messages
-      if (error.response?.status === 401) {
-        toast.error('Unauthorized. Please login again.');
+      // ✅ Better error messages
+      if (error.message === 'Request timeout') {
+        toast.error('Update is taking too long. Please try again.');
+      } else if (error.response?.status === 401) {
+        toast.error('Session expired. Please login again.');
       } else if (error.response?.status === 404) {
         toast.error('Profile not found');
-      } else if (error.message.includes('Network Error')) {
+      } else if (error.code === 'ERR_NETWORK') {
         toast.error('Network error. Check your connection.');
       } else {
         toast.error(
@@ -148,7 +148,7 @@ const UserProfile = () => {
         );
       }
     } finally {
-      console.log('Setting loading to false');
+      // ✅ Always stop loading
       setLoading(false);
     }
   };
@@ -190,8 +190,17 @@ const UserProfile = () => {
               disabled={loading}
               className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <FiSave />
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <FiSave />
+                  Save
+                </>
+              )}
             </button>
             <button
               onClick={handleCancel}
@@ -226,7 +235,7 @@ const UserProfile = () => {
 
           {/* Form Fields */}
           <div className="space-y-6">
-            {/* Name & Photo URL */}
+            {/* Name & Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -352,12 +361,18 @@ const UserProfile = () => {
                     type="text"
                     value={skillInput}
                     onChange={e => setSkillInput(e.target.value)}
-                    onKeyPress={e => e.key === 'Enter' && handleAddSkill()}
+                    onKeyPress={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddSkill();
+                      }
+                    }}
                     placeholder="Add a skill..."
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6f3c] dark:bg-gray-700 dark:text-white"
                   />
                   <button
                     onClick={handleAddSkill}
+                    type="button"
                     className="px-4 py-2 bg-[#ff6f3c] text-white rounded-lg hover:bg-[#ff9346] transition"
                   >
                     Add
@@ -374,6 +389,7 @@ const UserProfile = () => {
                       {skill}
                       {isEditing && (
                         <button
+                          type="button"
                           onClick={() => handleRemoveSkill(skill)}
                           className="hover:text-red-500"
                         >

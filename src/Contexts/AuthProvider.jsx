@@ -69,8 +69,8 @@ const AuthProvider = ({ children }) => {
 
   const createUser = (email, password) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password).then(
-      async result => {
+    return createUserWithEmailAndPassword(auth, email, password)
+      .then(async result => {
         const role = await syncUserWithBackend(result.user, password);
         // Update user object with role
         setUser({
@@ -78,14 +78,16 @@ const AuthProvider = ({ children }) => {
           role: role,
         });
         return result;
-      }
-    );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const profileUpdate = (displayName, photoURL) => {
     setLoading(true);
-    return updateProfile(auth.currentUser, { displayName, photoURL }).then(
-      async () => {
+    return updateProfile(auth.currentUser, { displayName, photoURL })
+      .then(async () => {
         // Fetch role from backend
         const role = await fetchUserRole(auth.currentUser.email);
         // Update React context user state with role
@@ -95,14 +97,16 @@ const AuthProvider = ({ children }) => {
           photoURL,
           role: role,
         });
-      }
-    );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const signIn = (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password).then(
-      async result => {
+    return signInWithEmailAndPassword(auth, email, password)
+      .then(async result => {
         const role = await syncUserWithBackend(result.user, password);
         // Update user object with role
         setUser({
@@ -110,20 +114,26 @@ const AuthProvider = ({ children }) => {
           role: role,
         });
         return result;
-      }
-    );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const googleSignIn = () => {
     setLoading(true);
-    return signInWithPopup(auth, googleProvider).then(async res => {
-      const role = await syncUserWithBackend(res.user);
-      setUser({
-        ...res.user,
-        role: role,
+    return signInWithPopup(auth, googleProvider)
+      .then(async res => {
+        const role = await syncUserWithBackend(res.user);
+        setUser({
+          ...res.user,
+          role: role,
+        });
+        return res;
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      return res;
-    });
   };
 
   const signOutUser = () => {

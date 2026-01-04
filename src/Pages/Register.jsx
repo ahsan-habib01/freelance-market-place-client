@@ -2,12 +2,16 @@ import React, { use, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../Contexts/AuthContext';
+import axios from 'axios';
 import toast from 'react-hot-toast';
+
+const API_URL = 'https://freelify-market-place-server.vercel.app';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -28,12 +32,15 @@ const Register = () => {
     setPasswordError(validatePassword(value));
   };
 
-  const handleRegister = e => {
+  const handleRegister = async e => {
     e.preventDefault();
+
+    if (isSubmitting) return; // Prevent double submission
+
     const form = e.target;
     const name = form.name.value;
     const email = form.email.value;
-    const photoURL = form.photoURL.value;
+    const photoURL = form.photoURL.value || '';
 
     const error = validatePassword(password);
     if (error) {
@@ -41,47 +48,132 @@ const Register = () => {
       return;
     }
     setPasswordError('');
+    setIsSubmitting(true);
+    setLoading(true);
 
-    // Create user with Firebase and sync with backend
-    createUser(email, password)
-      .then(res => {
-        const user = res.user;
+    try {
+      console.log('🔵 Step 1: Creating Firebase user...');
 
-        // Update profile with name and photo
-        profileUpdate(name, photoURL)
-          .then(() => {
-            setUser({
-              ...user,
-              displayName: name,
-              photoURL: photoURL,
-            });
-            setLoading(false);
-            toast.success('Account created successfully!');
-            navigate('/');
-          })
-          .catch(e => {
-            toast.error(e.message);
-            setLoading(false);
-          });
-      })
-      .catch(e => {
-        toast.error(e.message);
-        setLoading(false);
+      // ✅ Step 1: Create Firebase user
+      const firebaseResult = await createUser(email, password);
+      const user = firebaseResult.user;
+      console.log('✅ Firebase user created:', user.email);
+
+      // ✅ Step 2: Update Firebase profile
+      console.log('🔵 Step 2: Updating Firebase profile...');
+      await profileUpdate(name, photoURL);
+      console.log('✅ Firebase profile updated');
+
+      // ✅ Step 3: Register user in MongoDB backend
+      console.log('🔵 Step 3: Registering in MongoDB...');
+      const backendResponse = await axios.post(`${API_URL}/auth/register`, {
+        name: name,
+        email: email,
+        password: password,
+        photoURL: photoURL,
       });
+
+      console.log('✅ MongoDB user created:', backendResponse.data);
+
+      // ✅ Step 4: Store JWT token
+      if (backendResponse.data.token) {
+        localStorage.setItem('token', backendResponse.data.token);
+        console.log('✅ JWT token stored');
+      }
+
+      // ✅ Step 5: Update context with user info
+      setUser({
+        ...user,
+        displayName: name,
+        photoURL: photoURL,
+      });
+
+      setLoading(false);
+      setIsSubmitting(false);
+      toast.success('Account created successfully!');
+      navigate('/');
+    } catch (error) {
+      console.error('❌ Registration failed:', error);
+      setLoading(false);
+      setIsSubmitting(false);
+
+      // Better error messages
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else if (error.code === 'auth/email-already-in-use') {
+        toast.error('This email is already registered');
+      } else if (error.code === 'auth/weak-password') {
+        toast.error('Password is too weak');
+      } else if (error.code === 'auth/invalid-email') {
+        toast.error('Invalid email address');
+      } else {
+        toast.error(error.message || 'Registration failed. Please try again.');
+      }
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    googleSignIn()
-      .then(res => {
-        setUser(res.user);
-        setLoading(false);
-        toast.success('Signed in with Google successfully!');
-        navigate('/');
-      })
-      .catch(e => {
-        toast.error(e.message);
-        setLoading(false);
-      });
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+
+    try {
+      console.log('🔵 Google Sign In started...');
+
+      // ✅ Step 1: Sign in with Google (Firebase)
+      const result = await googleSignIn();
+      const user = result.user;
+      console.log('✅ Google sign in successful:', user.email);
+
+      // ✅ Step 2: Register/Login with backend
+      try {
+        console.log('🔵 Syncing with MongoDB...');
+
+        // Try to register (will fail if user exists, that's okay)
+        const backendResponse = await axios.post(`${API_URL}/auth/register`, {
+          name: user.displayName || 'User',
+          email: user.email,
+          password: user.uid, // Use Firebase UID as password for social login
+          photoURL: user.photoURL || '',
+        });
+
+        // Store token if registration successful
+        if (backendResponse.data.token) {
+          localStorage.setItem('token', backendResponse.data.token);
+          console.log('✅ New user registered in MongoDB');
+        }
+      } catch (backendError) {
+        // If user already exists (400 error), try to login
+        if (backendError.response?.status === 400) {
+          console.log('🔵 User exists, logging in...');
+
+          try {
+            const loginResponse = await axios.post(`${API_URL}/auth/login`, {
+              email: user.email,
+              password: user.uid, // Use Firebase UID as password
+            });
+
+            if (loginResponse.data.token) {
+              localStorage.setItem('token', loginResponse.data.token);
+              console.log('✅ Logged in to MongoDB');
+            }
+          } catch (loginError) {
+            console.warn('⚠️ MongoDB login failed (non-critical):', loginError);
+            // Continue anyway - Firebase auth is successful
+          }
+        } else {
+          console.warn('⚠️ MongoDB sync failed (non-critical):', backendError);
+          // Continue anyway - Firebase auth is successful
+        }
+      }
+
+      setUser(user);
+      setLoading(false);
+      toast.success('Signed in with Google successfully!');
+      navigate('/');
+    } catch (error) {
+      console.error('❌ Google sign in failed:', error);
+      setLoading(false);
+      toast.error(error.message || 'Failed to sign in with Google');
+    }
   };
 
   return (
@@ -105,7 +197,8 @@ const Register = () => {
               name="name"
               placeholder="Enter your full name"
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500]"
+              disabled={isSubmitting}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500] disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -119,20 +212,22 @@ const Register = () => {
               name="email"
               placeholder="Enter your email"
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500]"
+              disabled={isSubmitting}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500] disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
           {/* Photo URL */}
           <div>
             <label className="block text-gray-700 dark:text-gray-200 font-medium mb-2">
-              Photo URL
+              Photo URL (Optional)
             </label>
             <input
-              type="url"
+              type="file"
               name="photoURL"
-              placeholder="Enter your photo URL (optional)"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500]"
+              placeholder="https://example.com/photo.jpg"
+              disabled={isSubmitting}
+              className="file-input w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:focus:ring-[#ff5500] disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -149,16 +244,18 @@ const Register = () => {
                 onChange={handlePasswordChange}
                 placeholder="Create a strong password"
                 required
+                disabled={isSubmitting}
                 className={`w-full px-4 py-2 border ${
                   passwordError
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-300 dark:border-gray-600 focus:ring-[#ff6900] dark:focus:ring-[#ff5500]'
-                } rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300`}
+                } rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                disabled={isSubmitting}
+                className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-50"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -179,7 +276,8 @@ const Register = () => {
               type="checkbox"
               id="terms"
               required
-              className="mt-1 w-4 h-4 text-[#ff6900] border-gray-300 rounded focus:ring-[#ff6900]"
+              disabled={isSubmitting}
+              className="mt-1 w-4 h-4 text-[#ff6900] border-gray-300 rounded focus:ring-[#ff6900] disabled:opacity-50"
             />
             <label
               htmlFor="terms"
@@ -187,14 +285,14 @@ const Register = () => {
             >
               I agree to the{' '}
               <Link
-                to="/terms"
+                to="/terms-of-service"
                 className="text-[#ff6f3c] hover:text-[#ff9346] font-medium"
               >
                 Terms & Conditions
               </Link>{' '}
               and{' '}
               <Link
-                to="/privacy"
+                to="/privacy-policy"
                 className="text-[#ff6f3c] hover:text-[#ff9346] font-medium"
               >
                 Privacy Policy
@@ -205,10 +303,17 @@ const Register = () => {
           {/* Register Button */}
           <button
             type="submit"
-            disabled={passwordError}
-            className="w-full bg-[#ff6f3c] text-white font-semibold py-2 rounded-lg hover:bg-[#ff9346] dark:hover:bg-[#ff6900] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={passwordError || isSubmitting}
+            className="w-full bg-[#ff6f3c] text-white font-semibold py-2 rounded-lg hover:bg-[#ff9346] dark:hover:bg-[#ff6900] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Register
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Creating Account...
+              </>
+            ) : (
+              'Register'
+            )}
           </button>
         </form>
 
@@ -225,7 +330,8 @@ const Register = () => {
         <button
           type="button"
           onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
+          disabled={isSubmitting}
+          className="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"

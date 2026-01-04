@@ -15,19 +15,24 @@ import {
   FiGrid,
 } from 'react-icons/fi';
 import Logo from '../Components/Navbar/Logo';
+import toast from 'react-hot-toast';
 
 const DashboardLayout = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, signOutUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    navigate('/auth/login');
+    signOutUser()
+      .then(() => {
+        navigate('/auth/login');
+        toast.success('Signed out successfully!');
+      })
+      .catch(e => toast.error(e.message));
   };
-  
+
   // User menu items
   const userMenuItems = [
     { name: 'Dashboard Home', path: '/dashboard', icon: FiHome },
@@ -54,9 +59,7 @@ const DashboardLayout = () => {
 
   // Combine menu items based on role
   const menuItems =
-    user?.role === 'admin'
-      ? [ ...adminMenuItems]
-      : userMenuItems;
+    user?.role === 'admin' ? [...adminMenuItems] : userMenuItems;
 
   const isActive = path => location.pathname === path;
 
@@ -80,9 +83,6 @@ const DashboardLayout = () => {
                 )}
               </button>
               <Link to="/" className="flex ml-2 md:mr-24">
-                {/* <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-blue-600 dark:text-blue-400">
-                  Freelify
-                </span> */}
                 <Logo></Logo>
               </Link>
             </div>
