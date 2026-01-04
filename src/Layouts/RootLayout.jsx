@@ -8,10 +8,10 @@ import ScrollToTop from '../Components/Static/ScrollToTop';
 const RootLayout = () => {
   return (
     <div className=" flex flex-col min-h-screen">
-      <header>
+      <header className="sticky top-0 z-50">
         <Navbar></Navbar>
       </header>
-      <main className="">
+      <main className="w-full flex-1">
         <Outlet></Outlet>
       </main>
       <footer>
@@ -19,7 +19,7 @@ const RootLayout = () => {
       </footer>
       <div>
         <ScrollToTop></ScrollToTop>
-        <Toaster position="top-center" reverseOrder={false} />
+        <Toaster position="top-center" reverseOrder={true} />
       </div>
     </div>
   );
