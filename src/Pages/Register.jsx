@@ -61,7 +61,7 @@ const Register = () => {
     try {
       console.log('🔵 Starting registration for:', email);
 
-      // ✅ Step 1: Try to register in MongoDB FIRST (this checks if email exists)
+      // ✅ Step 1: Register in MongoDB FIRST (this checks if email exists)
       console.log('🔵 Step 1: Registering in MongoDB...');
 
       const backendResponse = await axios.post(`${API_URL}/auth/register`, {
@@ -73,7 +73,7 @@ const Register = () => {
 
       console.log('✅ MongoDB user created:', backendResponse.data);
 
-      // ✅ Step 2: Now create Firebase user (MongoDB succeeded, so email is unique)
+      // ✅ Step 2: Create Firebase user (MongoDB succeeded, email is unique)
       console.log('🔵 Step 2: Creating Firebase user...');
 
       let firebaseUser;
@@ -90,7 +90,6 @@ const Register = () => {
         console.warn('⚠️ Firebase creation failed, but MongoDB user exists');
 
         // If Firebase fails but MongoDB succeeded, we can still continue
-        // The user can login with MongoDB credentials
         if (firebaseError.code === 'auth/email-already-in-use') {
           console.log("📝 Firebase user already exists, that's okay");
         } else {
@@ -110,6 +109,15 @@ const Register = () => {
           ...firebaseUser,
           displayName: name,
           photoURL: photoURL,
+          role: backendResponse.data.user.role || 'user',
+        });
+      } else {
+        // If Firebase failed, set user from backend data
+        setUser({
+          email: email,
+          displayName: name,
+          photoURL: photoURL,
+          role: backendResponse.data.user.role || 'user',
         });
       }
 
@@ -125,11 +133,15 @@ const Register = () => {
       // Handle MongoDB registration errors
       if (error.response?.status === 400) {
         // Email already exists in MongoDB
-        toast.error('This email is already registered. Please login instead.');
-      } else if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
+        const message =
+          error.response.data.message || 'This email is already registered.';
+        toast.error(message);
       } else if (error.response?.status === 500) {
         toast.error('Server error. Please try again later.');
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else if (error.message?.includes('Network')) {
+        toast.error('Network error. Please check your connection.');
       } else if (error.message) {
         toast.error(error.message);
       } else {
@@ -162,7 +174,7 @@ const Register = () => {
         const backendResponse = await axios.post(`${API_URL}/auth/register`, {
           name: user.displayName || 'User',
           email: user.email,
-          password: user.uid, // Use Firebase UID as password
+          password: `google_${user.uid}`, // Use Firebase UID as password for Google users
           photoURL: user.photoURL || '',
         });
 
@@ -170,13 +182,44 @@ const Register = () => {
           localStorage.setItem('token', backendResponse.data.token);
           console.log('✅ New user registered in MongoDB');
         }
+
+        setUser({
+          ...user,
+          role: backendResponse.data.user.role || 'user',
+        });
       } catch (backendError) {
-        // User might already exist, that's fine
-        console.log('⚠️ User might already exist in MongoDB');
+        // User might already exist, try to login
+        if (backendError.response?.status === 400) {
+          console.log('⚠️ User already exists, attempting login...');
+
+          try {
+            const loginResponse = await axios.post(`${API_URL}/auth/login`, {
+              email: user.email,
+              password: `google_${user.uid}`,
+            });
+
+            if (loginResponse.data.token) {
+              localStorage.setItem('token', loginResponse.data.token);
+              console.log('✅ Logged in to existing MongoDB account');
+            }
+
+            setUser({
+              ...user,
+              role: loginResponse.data.user.role || 'user',
+            });
+          } catch (loginError) {
+            console.warn('⚠️ Login failed, continuing with Firebase user');
+            setUser(user);
+          }
+        } else {
+          console.warn(
+            '⚠️ Backend registration failed, continuing with Firebase user'
+          );
+          setUser(user);
+        }
       }
 
-      setUser(user);
-      toast.success('Signed in with Google successfully!');
+      toast.success('✨ Signed in with Google successfully!');
 
       setTimeout(() => {
         navigate('/');
@@ -188,6 +231,8 @@ const Register = () => {
         toast.error('Sign in was cancelled');
       } else if (error.code === 'auth/popup-blocked') {
         toast.error('Please allow popups for this site');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        toast.error('Another sign-in popup is already open');
       } else {
         toast.error('Failed to sign in with Google');
       }

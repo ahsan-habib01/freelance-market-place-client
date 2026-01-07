@@ -23,10 +23,14 @@ const AuthProvider = ({ children }) => {
   const fetchUserRole = async email => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        return 'user';
+      }
+
       const response = await axios.get(`${API_URL}/users/profile/${email}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data.role || 'user';
+      return response.data?.role || 'user';
     } catch (error) {
       console.error('Failed to fetch user role:', error);
       return 'user';
@@ -36,33 +40,48 @@ const AuthProvider = ({ children }) => {
   // Sync user with backend and get role
   const syncUserWithBackend = async (firebaseUser, password = null) => {
     try {
-      // Try to login first
-      const loginResponse = await axios.post(`${API_URL}/auth/login`, {
-        email: firebaseUser.email,
-        password: password || 'firebase-user',
-      });
+      // Determine the password to use
+      const loginPassword = password || `google_${firebaseUser.uid}`;
 
-      if (loginResponse.data.success) {
-        localStorage.setItem('token', loginResponse.data.token);
-        return loginResponse.data.user.role || 'user';
-      }
-    } catch (error) {
-      // If login fails, register the user in backend
+      // Try to login first
       try {
-        const registerResponse = await axios.post(`${API_URL}/auth/register`, {
-          name: firebaseUser.displayName || 'User',
+        const loginResponse = await axios.post(`${API_URL}/auth/login`, {
           email: firebaseUser.email,
-          password: password || 'firebase-user',
-          photoURL: firebaseUser.photoURL || '',
+          password: loginPassword,
         });
 
-        if (registerResponse.data.success) {
-          localStorage.setItem('token', registerResponse.data.token);
-          return registerResponse.data.user.role || 'user';
+        if (loginResponse.data.success) {
+          localStorage.setItem('token', loginResponse.data.token);
+          return loginResponse.data.user.role || 'user';
         }
-      } catch (registerError) {
-        console.error('Backend sync failed:', registerError);
+      } catch (loginError) {
+        // If login fails with 404 or 401, try to register
+        if (
+          loginError.response?.status === 404 ||
+          loginError.response?.status === 401
+        ) {
+          console.log('User not found in backend, attempting registration...');
+
+          const registerResponse = await axios.post(
+            `${API_URL}/auth/register`,
+            {
+              name: firebaseUser.displayName || 'User',
+              email: firebaseUser.email,
+              password: loginPassword,
+              photoURL: firebaseUser.photoURL || '',
+            }
+          );
+
+          if (registerResponse.data.success) {
+            localStorage.setItem('token', registerResponse.data.token);
+            return registerResponse.data.user.role || 'user';
+          }
+        } else {
+          console.error('Backend login error:', loginError);
+        }
       }
+    } catch (error) {
+      console.error('Backend sync failed:', error);
     }
     return 'user';
   };
@@ -72,7 +91,6 @@ const AuthProvider = ({ children }) => {
     return createUserWithEmailAndPassword(auth, email, password)
       .then(async result => {
         const role = await syncUserWithBackend(result.user, password);
-        // Update user object with role
         setUser({
           ...result.user,
           role: role,
@@ -88,9 +106,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return updateProfile(auth.currentUser, { displayName, photoURL })
       .then(async () => {
-        // Fetch role from backend
         const role = await fetchUserRole(auth.currentUser.email);
-        // Update React context user state with role
         setUser({
           ...auth.currentUser,
           displayName,
@@ -108,7 +124,6 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password)
       .then(async result => {
         const role = await syncUserWithBackend(result.user, password);
-        // Update user object with role
         setUser({
           ...result.user,
           role: role,
@@ -138,6 +153,7 @@ const AuthProvider = ({ children }) => {
 
   const signOutUser = () => {
     localStorage.removeItem('token');
+    setUser(null);
     return signOut(auth);
   };
 
@@ -155,7 +171,7 @@ const AuthProvider = ({ children }) => {
       }
       setLoading(false);
     });
-    return unSubscribe;
+    return () => unSubscribe();
   }, []);
 
   const authInfo = {

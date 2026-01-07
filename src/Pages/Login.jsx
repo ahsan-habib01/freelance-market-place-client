@@ -65,8 +65,11 @@ const Login = () => {
           console.log('✅ JWT token stored');
         }
 
-        // ✅ Step 4: Update user context
-        setUser(user);
+        // ✅ Step 4: Update user context with role
+        setUser({
+          ...user,
+          role: backendResponse.data.user.role || 'user',
+        });
 
         toast.success('Welcome back to Freelify!');
 
@@ -82,30 +85,40 @@ const Login = () => {
           toast.error('Invalid email or password');
         } else if (backendError.response?.status === 404) {
           toast.error('User not found. Please register first.');
+        } else if (backendError.response?.data?.message) {
+          toast.error(backendError.response.data.message);
         } else {
           toast.error('Login failed. Please try again.');
         }
 
         // Still set the user since Firebase auth succeeded
         setUser(user);
-        navigate(location.state?.from || '/');
+
+        // Navigate to home anyway since Firebase succeeded
+        setTimeout(() => {
+          navigate(location.state?.from || '/');
+        }, 1500);
       }
     } catch (error) {
       console.error('❌ Login failed:', error);
 
       // Handle Firebase authentication errors
       if (error.code === 'auth/user-not-found') {
-        toast.error('No account found with this email');
+        toast.error('No account found with this email. Please register first.');
       } else if (error.code === 'auth/wrong-password') {
-        toast.error('Incorrect password');
+        toast.error('Incorrect password. Please try again.');
       } else if (error.code === 'auth/invalid-email') {
-        toast.error('Invalid email address');
+        toast.error('Invalid email address format');
       } else if (error.code === 'auth/user-disabled') {
         toast.error('This account has been disabled');
       } else if (error.code === 'auth/too-many-requests') {
         toast.error('Too many failed attempts. Please try again later.');
       } else if (error.code === 'auth/network-request-failed') {
         toast.error('Network error. Please check your connection.');
+      } else if (error.code === 'auth/invalid-credential') {
+        toast.error(
+          'Invalid email or password. Please check your credentials.'
+        );
       } else {
         toast.error('Login failed. Please check your credentials.');
       }
@@ -133,16 +146,21 @@ const Login = () => {
       console.log('🔵 Syncing with MongoDB...');
 
       try {
-        // Try to login first
+        // Try to login first with Google-specific password
         const loginResponse = await axios.post(`${API_URL}/auth/login`, {
           email: user.email,
-          password: user.uid, // Google users use Firebase UID as password
+          password: `google_${user.uid}`, // Google users use this pattern
         });
 
         if (loginResponse.data.token) {
           localStorage.setItem('token', loginResponse.data.token);
           console.log('✅ Logged in to MongoDB');
         }
+
+        setUser({
+          ...user,
+          role: loginResponse.data.user.role || 'user',
+        });
       } catch (loginError) {
         // If login fails, try to register
         if (
@@ -157,7 +175,7 @@ const Login = () => {
               {
                 name: user.displayName || 'User',
                 email: user.email,
-                password: user.uid,
+                password: `google_${user.uid}`,
                 photoURL: user.photoURL || '',
               }
             );
@@ -166,14 +184,24 @@ const Login = () => {
               localStorage.setItem('token', registerResponse.data.token);
               console.log('✅ Registered in MongoDB');
             }
+
+            setUser({
+              ...user,
+              role: registerResponse.data.user.role || 'user',
+            });
           } catch (registerError) {
             console.warn('⚠️ MongoDB registration failed:', registerError);
+            // Continue with Firebase user
+            setUser(user);
           }
+        } else {
+          console.warn('⚠️ MongoDB login failed:', loginError);
+          // Continue with Firebase user
+          setUser(user);
         }
       }
 
-      setUser(user);
-      toast.success('Signed in with Google successfully!');
+      toast.success('✨ Signed in with Google successfully!');
 
       setTimeout(() => {
         navigate(location.state?.from || '/');
@@ -185,6 +213,8 @@ const Login = () => {
         toast.error('Sign in was cancelled');
       } else if (error.code === 'auth/popup-blocked') {
         toast.error('Please allow popups for this site');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        toast.error('Another sign-in popup is already open');
       } else if (
         error.code === 'auth/account-exists-with-different-credential'
       ) {
@@ -198,6 +228,18 @@ const Login = () => {
     }
   };
 
+  // Demo credentials auto-fill function
+  const fillDemoCredentials = type => {
+    if (type === 'user') {
+      setEmail('demo@user.com');
+      setPassword('Demo123');
+      toast.success('Demo user credentials filled!');
+    } else if (type === 'admin') {
+      setEmail('admin@freelify.com');
+      setPassword('Admin123');
+      toast.success('Admin credentials filled!');
+    }
+  };
 
   return (
     <section className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] dark:from-[#0f172a] dark:to-[#020617] py-16">
@@ -208,6 +250,26 @@ const Login = () => {
         <p className="text-center text-sm text-gray-600 dark:text-gray-300 mb-6">
           Log in to continue exploring Freelify
         </p>
+
+        {/* Demo Credentials Buttons */}
+        <div className="flex gap-3 mb-6">
+          <button
+            type="button"
+            onClick={() => fillDemoCredentials('user')}
+            disabled={isLoading}
+            className="flex-1 px-4 py-2 border-2 border-[#ff6f3c] text-[#ff6f3c] font-medium rounded-lg hover:bg-[#fff3ea] dark:hover:bg-[#1a1f2e] transition disabled:opacity-50 text-sm"
+          >
+            Demo User
+          </button>
+          <button
+            type="button"
+            onClick={() => fillDemoCredentials('admin')}
+            disabled={isLoading}
+            className="flex-1 px-4 py-2 border-2 border-[#ff6f3c] text-[#ff6f3c] font-medium rounded-lg hover:bg-[#fff3ea] dark:hover:bg-[#1a1f2e] transition disabled:opacity-50 text-sm"
+          >
+            Demo Admin
+          </button>
+        </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           {/* Email */}
