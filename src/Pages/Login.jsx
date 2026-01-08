@@ -201,7 +201,7 @@ const Login = () => {
         }
       }
 
-      toast.success('✨ Signed in with Google successfully!');
+      toast.success('Signed in with Google successfully!');
 
       setTimeout(() => {
         navigate(location.state?.from || '/');
@@ -228,18 +228,6 @@ const Login = () => {
     }
   };
 
-  // Demo credentials auto-fill function
-  const fillDemoCredentials = type => {
-    if (type === 'user') {
-      setEmail('demo@user.com');
-      setPassword('Demo123');
-      toast.success('Demo user credentials filled!');
-    } else if (type === 'admin') {
-      setEmail('admin@freelify.com');
-      setPassword('Admin123');
-      toast.success('Admin credentials filled!');
-    }
-  };
 
   return (
     <section className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#fff3ea] to-[#fffdfb] dark:from-[#0f172a] dark:to-[#020617] py-16">
@@ -250,26 +238,6 @@ const Login = () => {
         <p className="text-center text-sm text-gray-600 dark:text-gray-300 mb-6">
           Log in to continue exploring Freelify
         </p>
-
-        {/* Demo Credentials Buttons */}
-        <div className="flex gap-3 mb-6">
-          <button
-            type="button"
-            onClick={() => fillDemoCredentials('user')}
-            disabled={isLoading}
-            className="flex-1 px-4 py-2 border-2 border-[#ff6f3c] text-[#ff6f3c] font-medium rounded-lg hover:bg-[#fff3ea] dark:hover:bg-[#1a1f2e] transition disabled:opacity-50 text-sm"
-          >
-            Demo User
-          </button>
-          <button
-            type="button"
-            onClick={() => fillDemoCredentials('admin')}
-            disabled={isLoading}
-            className="flex-1 px-4 py-2 border-2 border-[#ff6f3c] text-[#ff6f3c] font-medium rounded-lg hover:bg-[#fff3ea] dark:hover:bg-[#1a1f2e] transition disabled:opacity-50 text-sm"
-          >
-            Demo Admin
-          </button>
-        </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           {/* Email */}

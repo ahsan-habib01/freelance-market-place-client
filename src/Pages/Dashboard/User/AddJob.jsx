@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
-import useAuth from '../../../Hooks/useAuth';
-import useAxiosSecure from '../../../Hooks/useAxiosSecure';
 import toast from 'react-hot-toast';
 import {
   Briefcase,
   DollarSign,
   Clock,
   MapPin,
-  Users,
-  Calendar,
   Tag,
+  Calendar,
   X,
 } from 'lucide-react';
+import useAuth from '../../../Hooks/useAuth';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure';
 
 const AddJob = () => {
   const { user } = useAuth();
@@ -23,7 +22,6 @@ const AddJob = () => {
   const [skills, setSkills] = useState([]);
   const [skillInput, setSkillInput] = useState('');
 
-  // Handle skill tags
   const addSkill = () => {
     if (skillInput.trim() && !skills.includes(skillInput.trim())) {
       setSkills([...skills, skillInput.trim()]);
@@ -42,19 +40,35 @@ const AddJob = () => {
     }
   };
 
-  // Handle form submission
   const handleAddJob = async e => {
     e.preventDefault();
+
+    // ✅ Prevent double submission
+    if (isSubmitting) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     const form = e.target;
 
+    // ✅ Client-side validation
+    const title = form.title.value.trim();
+    const category = form.category.value;
+    const description = form.description.value.trim();
+
+    if (!title || !category || !description) {
+      toast.error('Please fill in all required fields');
+      setIsSubmitting(false);
+      return;
+    }
+
     const jobData = {
       // Basic Info
-      title: form.title.value,
-      category: form.category.value,
-      summary: form.summary.value,
-      description: form.description.value,
+      title,
+      category,
+      summary: form.summary.value.trim(),
+      description,
 
       // Financial
       budgetType: form.budgetType.value,
@@ -63,7 +77,7 @@ const AddJob = () => {
       currency: form.currency.value,
 
       // Timeline
-      duration: form.duration.value,
+      duration: parseInt(form.duration.value) || 0,
       durationUnit: form.durationUnit.value,
       deadline: form.deadline.value,
 
@@ -74,69 +88,96 @@ const AddJob = () => {
 
       // Location & Work Type
       locationType: form.locationType.value,
-      location: form.location.value,
+      location: form.location.value.trim(),
       workingHours: form.workingHours.value,
 
       // Additional Info
       language: form.language.value,
-      coverImage: form.coverImage.value,
+      coverImage: form.coverImage.value.trim(),
 
-      // Auto-filled
+      // Metadata (postedBy for display purposes)
       postedBy: user?.displayName || user?.name || 'Anonymous',
-      userEmail: user?.email,
-      postedAt: new Date().toISOString(),
       status: 'open',
       applicants: 0,
+
+      // ✅ DO NOT SEND: postedAt, createdAt, userEmail
+      // Server will handle these automatically
     };
+
+    console.log('📤 Submitting job data:', {
+      title: jobData.title,
+      category: jobData.category,
+      hasSkills: jobData.skills.length > 0,
+    });
 
     try {
       const response = await axiosSecure.post('/jobs', jobData);
 
-      if (response.data.insertedId) {
+      console.log('✅ Server response:', response.data);
+
+      // ✅ Check for successful creation
+      if (response.data.success && response.data.insertedId) {
+        toast.success('🎉 Job posted successfully!');
+
+        // ✅ Navigate to user's jobs page
+        setTimeout(() => {
+          navigate('/dashboard/my-jobs');
+        }, 500);
+      } else if (response.data.insertedId) {
+        // Fallback for older API format
         toast.success('Job posted successfully!');
         navigate('/dashboard/my-jobs');
+      } else {
+        throw new Error('Job creation failed');
       }
     } catch (error) {
-      console.error('Add job error:', error);
-      toast.error(error.response?.data?.message || 'Failed to post job');
+      console.error('❌ Add job error:', error);
+
+      // ✅ Detailed error handling
+      if (error.response) {
+        const errorMsg = error.response.data?.message || 'Failed to post job';
+        toast.error(errorMsg);
+        console.error('Server error:', error.response.data);
+      } else if (error.request) {
+        toast.error('Network error. Please check your connection.');
+        console.error('Network error:', error.request);
+      } else {
+        toast.error('An unexpected error occurred');
+        console.error('Error:', error.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <section className="min-h-screen py-16 px-4 bg-gradient-to-br from-[#ffebe0] via-[#fff0e5] to-[#fff5ec] dark:from-gray-800 dark:via-[#14181f] dark:to-[#1a1f27]">
-      <title>Add New Job - Freelify</title>
-
+    <section className="min-h-screen py-16 px-4 bg-gradient-to-br from-orange-50 via-orange-100 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-5xl mx-auto bg-white/90 dark:bg-[#121212] shadow-2xl rounded-3xl p-8 md:p-12 border border-[#ff9346]/20 backdrop-blur-sm"
+        className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-3xl p-8 md:p-12"
       >
-        {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#ff9346] to-[#ff6900] rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full mb-4">
             <Briefcase className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#ff9346] to-[#ff6900] bg-clip-text text-transparent mb-2">
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-2">
             Post a New Job
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-300">
             Fill in the details to attract the best freelancers
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleAddJob} className="space-y-8">
-          {/* SECTION 1: Basic Information */}
+          {/* Basic Information */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-[#ff9346]/30 pb-2">
-              <Briefcase className="w-5 h-5 text-[#ff6900]" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-orange-300 dark:border-orange-700 pb-2">
+              <Briefcase className="w-5 h-5 text-orange-600" />
               Basic Information
             </h3>
 
-            {/* Job Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Job Title *
@@ -145,19 +186,18 @@ const AddJob = () => {
                 type="text"
                 name="title"
                 placeholder="e.g., Build a Responsive E-commerce Website"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               />
             </div>
 
-            {/* Category */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Category *
               </label>
               <select
                 name="category"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               >
                 <option value="">Select a category</option>
@@ -169,14 +209,9 @@ const AddJob = () => {
                 <option value="Content Writing">Content Writing</option>
                 <option value="Video Editing">Video Editing</option>
                 <option value="Data Entry">Data Entry</option>
-                <option value="3D Modeling">3D Modeling</option>
-                <option value="SEO Services">SEO Services</option>
-                <option value="Translation">Translation</option>
-                <option value="Virtual Assistant">Virtual Assistant</option>
               </select>
             </div>
 
-            {/* Summary */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Short Summary *
@@ -184,14 +219,13 @@ const AddJob = () => {
               <input
                 type="text"
                 name="summary"
-                placeholder="Brief one-line description (max 100 characters)"
+                placeholder="Brief description (max 100 characters)"
                 maxLength="100"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               />
             </div>
 
-            {/* Detailed Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Detailed Description *
@@ -199,29 +233,28 @@ const AddJob = () => {
               <textarea
                 name="description"
                 rows="6"
-                placeholder="Provide a detailed description of the job, requirements, deliverables, etc."
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                placeholder="Detailed job description"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               ></textarea>
             </div>
           </div>
 
-          {/* SECTION 2: Budget & Payment */}
+          {/* Budget & Payment */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-[#ff9346]/30 pb-2">
-              <DollarSign className="w-5 h-5 text-[#ff6900]" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-orange-300 dark:border-orange-700 pb-2">
+              <DollarSign className="w-5 h-5 text-orange-600" />
               Budget & Payment
             </h3>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Budget Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Budget Type *
                 </label>
                 <select
                   name="budgetType"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 >
                   <option value="fixed">Fixed Price</option>
@@ -230,14 +263,13 @@ const AddJob = () => {
                 </select>
               </div>
 
-              {/* Currency */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Currency *
                 </label>
                 <select
                   name="currency"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 >
                   <option value="USD">USD - US Dollar</option>
@@ -245,12 +277,9 @@ const AddJob = () => {
                   <option value="GBP">GBP - British Pound</option>
                   <option value="BDT">BDT - Bangladeshi Taka</option>
                   <option value="INR">INR - Indian Rupee</option>
-                  <option value="CAD">CAD - Canadian Dollar</option>
-                  <option value="AUD">AUD - Australian Dollar</option>
                 </select>
               </div>
 
-              {/* Minimum Budget */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Minimum Budget *
@@ -260,13 +289,12 @@ const AddJob = () => {
                   name="budgetMin"
                   min="0"
                   step="0.01"
-                  placeholder="e.g., 500"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  placeholder="500"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 />
               </div>
 
-              {/* Maximum Budget */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Maximum Budget *
@@ -276,23 +304,22 @@ const AddJob = () => {
                   name="budgetMax"
                   min="0"
                   step="0.01"
-                  placeholder="e.g., 1500"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  placeholder="1500"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 />
               </div>
             </div>
           </div>
 
-          {/* SECTION 3: Timeline */}
+          {/* Timeline */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-[#ff9346]/30 pb-2">
-              <Clock className="w-5 h-5 text-[#ff6900]" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-orange-300 dark:border-orange-700 pb-2">
+              <Clock className="w-5 h-5 text-orange-600" />
               Timeline & Duration
             </h3>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {/* Project Duration */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Duration *
@@ -301,20 +328,19 @@ const AddJob = () => {
                   type="number"
                   name="duration"
                   min="1"
-                  placeholder="e.g., 2"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  placeholder="2"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 />
               </div>
 
-              {/* Duration Unit */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Duration Unit *
                 </label>
                 <select
                   name="durationUnit"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 >
                   <option value="days">Days</option>
@@ -323,7 +349,6 @@ const AddJob = () => {
                 </select>
               </div>
 
-              {/* Application Deadline */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Application Deadline *
@@ -332,28 +357,27 @@ const AddJob = () => {
                   type="date"
                   name="deadline"
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 />
               </div>
             </div>
           </div>
 
-          {/* SECTION 4: Requirements */}
+          {/* Requirements */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-[#ff9346]/30 pb-2">
-              <Tag className="w-5 h-5 text-[#ff6900]" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-orange-300 dark:border-orange-700 pb-2">
+              <Tag className="w-5 h-5 text-orange-600" />
               Requirements & Skills
             </h3>
 
-            {/* Experience Level */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Experience Level *
               </label>
               <select
                 name="experienceLevel"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               >
                 <option value="beginner">Beginner - Entry Level</option>
@@ -364,7 +388,6 @@ const AddJob = () => {
               </select>
             </div>
 
-            {/* Skills Required */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Required Skills
@@ -376,24 +399,23 @@ const AddJob = () => {
                   onChange={e => setSkillInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type a skill and press Enter"
-                  className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={addSkill}
-                  className="px-6 py-3 bg-[#ff6900] hover:bg-[#e55f00] text-white rounded-xl font-medium transition-colors"
+                  className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-medium transition-colors"
                 >
                   Add
                 </button>
               </div>
 
-              {/* Skill Tags */}
               {skills.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {skills.map((skill, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-[#ff9346]/20 text-[#ff6900] dark:bg-[#ff9346]/10 dark:text-[#ff9346] rounded-full text-sm font-medium"
+                      className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium"
                     >
                       {skill}
                       <button
@@ -409,7 +431,6 @@ const AddJob = () => {
               )}
             </div>
 
-            {/* Number of Positions */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Number of Positions *
@@ -419,37 +440,35 @@ const AddJob = () => {
                 name="numberOfPositions"
                 min="1"
                 defaultValue="1"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               />
             </div>
           </div>
 
-          {/* SECTION 5: Location & Work Type */}
+          {/* Location */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-[#ff9346]/30 pb-2">
-              <MapPin className="w-5 h-5 text-[#ff6900]" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-orange-300 dark:border-orange-700 pb-2">
+              <MapPin className="w-5 h-5 text-orange-600" />
               Location & Work Details
             </h3>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Location Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Work Location *
                 </label>
                 <select
                   name="locationType"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 >
-                  <option value="Remote">Remote (Work from anywhere)</option>
-                  <option value="On-site">On-site (Physical location)</option>
-                  <option value="Hybrid">Hybrid (Mix of both)</option>
+                  <option value="Remote">Remote</option>
+                  <option value="On-site">On-site</option>
+                  <option value="Hybrid">Hybrid</option>
                 </select>
               </div>
 
-              {/* Specific Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   City/Country *
@@ -457,20 +476,19 @@ const AddJob = () => {
                 <input
                   type="text"
                   name="location"
-                  placeholder="e.g., New York, USA or Worldwide"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  placeholder="New York, USA or Worldwide"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 />
               </div>
 
-              {/* Working Hours */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Working Hours *
                 </label>
                 <select
                   name="workingHours"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 >
                   <option value="Full-time">Full-time</option>
@@ -480,37 +498,31 @@ const AddJob = () => {
                 </select>
               </div>
 
-              {/* Preferred Language */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Preferred Language *
                 </label>
                 <select
                   name="language"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                   required
                 >
                   <option value="English">English</option>
                   <option value="Spanish">Spanish</option>
-                  <option value="French">French</option>
-                  <option value="German">German</option>
                   <option value="Bengali">Bengali</option>
                   <option value="Hindi">Hindi</option>
-                  <option value="Chinese">Chinese</option>
-                  <option value="Arabic">Arabic</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* SECTION 6: Media */}
+          {/* Cover Image */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-[#ff9346]/30 pb-2">
-              <Calendar className="w-5 h-5 text-[#ff6900]" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-orange-300 dark:border-orange-700 pb-2">
+              <Calendar className="w-5 h-5 text-orange-600" />
               Cover Image
             </h3>
 
-            {/* Cover Image URL */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Cover Image URL *
@@ -519,23 +531,22 @@ const AddJob = () => {
                 type="url"
                 name="coverImage"
                 placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1c] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#ff9346] focus:outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-400 focus:outline-none"
                 required
               />
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Recommended size: 1200x630px. Use high-quality images for better
-                visibility.
+                Recommended size: 1200x630px
               </p>
             </div>
           </div>
 
           {/* Submit Button */}
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+            whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 font-bold text-lg text-white rounded-xl bg-gradient-to-r from-[#ff9346] to-[#ff6900] shadow-lg hover:shadow-xl hover:brightness-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 font-bold text-lg text-white rounded-xl bg-gradient-to-r from-orange-400 to-orange-600 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">

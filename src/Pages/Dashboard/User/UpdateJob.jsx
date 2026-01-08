@@ -92,10 +92,13 @@ const UpdateJob = () => {
 
     try {
       const response = await axiosSecure.put(`/updateJob/${id}`, updatedJob);
+      console.log(response)
 
-      if (response.data.modifiedCount > 0) {
+      if (response.data.data.modifiedCount > 0) {
         toast.success('Job updated successfully!');
         navigate(`/all-jobs/${id}`);
+        console.log('object');
+
       } else {
         toast('No changes detected.');
       }
@@ -423,7 +426,7 @@ const UpdateJob = () => {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 font-bold text-lg text-white rounded-xl bg-gradient-to-r from-[#ff9346] to-[#ff6900] shadow-lg hover:shadow-xl hover:brightness-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 font-bold text-lg text-white rounded-xl bg-gradient-to-r from-[#ff9346] to-[#ff6900] shadow-lg hover:shadow-xl hover:brightness-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">

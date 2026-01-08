@@ -219,7 +219,7 @@ const Register = () => {
         }
       }
 
-      toast.success('✨ Signed in with Google successfully!');
+      toast.success('Signed in with Google successfully!');
 
       setTimeout(() => {
         navigate('/');
